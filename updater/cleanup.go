@@ -121,7 +121,6 @@ func loadPowershellConfig() *powershellConfig {
 	return &cfg
 }
 
-
 // cleanDir removes all known leftover patterns in a single directory.
 func cleanDir(dir, baseName, selfPath string) int {
 	patterns := []string{
