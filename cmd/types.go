@@ -13,18 +13,18 @@ import (
 
 // MoveContext groups parameters for batch and interactive move flows.
 type MoveContext struct {
+	Files     []os.FileInfo
+	SourceDir string
+	Home      string
 	Database  *db.DB
 	Scanner   *bufio.Scanner
-	SourceDir string
-	Files     []os.FileInfo
-	Home      string
 }
 
 // CleanupContext groups parameters for popout folder cleanup operations.
 type CleanupContext struct {
+	BatchID  string
 	Scanner  *bufio.Scanner
 	Database *db.DB
-	BatchID  string
 }
 
 // ScanServiceConfig groups parameters for post-scan services (REST, watch).
@@ -37,8 +37,8 @@ type ScanServiceConfig struct {
 
 // SuggestCollector groups parameters for suggestion collection helpers.
 type SuggestCollector struct {
-	Client      *tmdb.Client
 	ExistingIDs map[int]bool
+	Client      *tmdb.Client
 	Count       int
 }
 
@@ -64,31 +64,31 @@ type RecursiveWalkOpts struct {
 
 // ThumbnailInput groups parameters for poster/thumbnail download functions.
 type ThumbnailInput struct {
+	PosterPath string
+	OutputDir  string
 	Client     *tmdb.Client
 	Database   *db.DB
 	Media      *db.Media
-	PosterPath string
-	OutputDir  string
 }
 
 // HistoryLogInput groups parameters for saving move history to JSON log.
 type HistoryLogInput struct {
 	BasePath string
 	Title    string
-	Year     int
 	FromPath string
 	ToPath   string
+	Year     int
 }
 
 // ScanLoopConfig groups parameters for the main scan processing loop.
 type ScanLoopConfig struct {
-	Client    *tmdb.Client
 	ScanDir   string
 	BatchID   string
+	Client    *tmdb.Client
+	JSONItems *[]scanJSONItem
 	UseJSON   bool
 	UseTable  bool
 	HasTMDb   bool
-	JSONItems *[]scanJSONItem
 }
 
 // ScanOutputOpts groups output format flags used during scan processing.
@@ -106,16 +106,16 @@ type DryRunCounters struct {
 
 // WatchState groups mutable state for watch-mode polling cycles.
 type WatchState struct {
+	Seen    map[string]bool
 	Client  *tmdb.Client
 	HasTMDb bool
-	Seen    map[string]bool
 }
 
 // SuggestTypeInput groups parameters for type-based suggestion generation.
 type SuggestTypeInput struct {
+	MediaType string
 	Database  *db.DB
 	Client    *tmdb.Client
-	MediaType string
 	Count     int
 }
 
@@ -129,38 +129,38 @@ type BatchMovePreview struct {
 
 // TrackMoveInput groups parameters for recording a file move operation.
 type TrackMoveInput struct {
-	Database  *db.DB
-	Result    cleaner.Result
-	FileInfo  os.FileInfo
 	SrcPath   string
 	DestPath  string
 	CleanName string
+	FileInfo  os.FileInfo
+	Database  *db.DB
+	Result    cleaner.Result
 }
 
 // FindMoveMediaInput groups parameters for finding or creating media during moves.
 type FindMoveMediaInput struct {
-	Database *db.DB
-	Result   cleaner.Result
-	FileInfo os.FileInfo
 	SrcPath  string
 	DestPath string
+	FileInfo os.FileInfo
+	Database *db.DB
+	Result   cleaner.Result
 }
 
 // WalkEntryInput groups parameters for processing a single walk entry during popout discovery.
 type WalkEntryInput struct {
-	RootDir  string
-	Path     string
-	Info     os.FileInfo
+	RootDir string
+	Path    string
+	Info    os.FileInfo
+	Items   *[]popoutItem
 	MaxDepth int
-	Items    *[]popoutItem
 }
 
 // FolderRemoveInput groups parameters for folder removal operations.
 type FolderRemoveInput struct {
+	DirPath string
+	DirName string
+	BatchID string
 	Database *db.DB
-	DirPath  string
-	DirName  string
-	BatchID  string
 }
 
 // MediaRequest groups database context for REST media handlers.
@@ -179,10 +179,10 @@ type MediaPatchRequest struct {
 
 // MediaUpdateField groups parameters for a single media field update.
 type MediaUpdateField struct {
-	Database *db.DB
-	ID       int64
 	Key      string
 	Val      interface{}
+	Database *db.DB
+	ID       int64
 }
 
 // UniqueFilter groups parameters for deduplicating search results.
@@ -193,19 +193,19 @@ type UniqueFilter struct {
 
 // RecursiveFileContext groups parameters for handling a file during recursive directory walks.
 type RecursiveFileContext struct {
-	Entry   os.DirEntry
+	Files   *[]videoFile
 	Path    string
 	ScanDir string
+	Entry   os.DirEntry
 	Opts    RecursiveWalkOpts
-	Files   *[]videoFile
 }
 
 // TrackScanResult groups the result of scanning a single file for action tracking.
 type TrackScanResult struct {
-	Media     *db.Media
 	FullPath  string
-	MediaID   int64
 	InsertErr error
+	Media     *db.Media
+	MediaID   int64
 }
 
 // DiscoverGenreInput groups parameters for genre-based discovery in suggestions.
@@ -223,12 +223,12 @@ type FillRecoInput struct {
 
 // FinalizeScanInput groups parameters for post-scan finalization.
 type FinalizeScanInput struct {
+	JSONItems []scanJSONItem
 	ScanDir   string
 	OutputDir string
 	Database  *db.DB
 	Creds     tmdbCredentials
 	Removed   int
-	JSONItems []scanJSONItem
 	UseJSON   bool
 }
 
@@ -249,31 +249,31 @@ type DryRunOutput struct {
 
 // RemoveStaleInput groups parameters for stale entry removal during scan.
 type RemoveStaleInput struct {
-	Database      *db.DB
 	ExistingMedia []db.Media
 	DiskPaths     map[string]bool
 	BatchID       string
+	Database      *db.DB
 	Opts          ScanOutputOpts
 }
 
 // ProcessExistingInput groups parameters for processing existing media during scan.
 type ProcessExistingInput struct {
-	EM       *db.Media
-	VF       videoFile
+	BatchID  string
 	Client   *tmdb.Client
 	Database *db.DB
+	EM       *db.Media
 	Opts     ScanOutputOpts
-	BatchID  string
+	VF       videoFile
 	HasTMDb  bool
 }
 
 // HandleRescanInput groups parameters for rescanning a media entry.
 type HandleRescanInput struct {
-	EM       *db.Media
+	BatchID  string
 	Client   *tmdb.Client
 	Database *db.DB
+	EM       *db.Media
 	Opts     ScanOutputOpts
-	BatchID  string
 }
 
 // AppendUniqueInput groups parameters for appending unique search results.
