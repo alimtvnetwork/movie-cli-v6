@@ -31,21 +31,21 @@ func printSearchResultsJSON(results []tmdb.SearchResult) {
 		if i >= 15 {
 			break
 		}
-		mediaType := r.MediaType
+		mediaType := results[i].MediaType
 		if mediaType == "" {
 			mediaType = string(db.MediaTypeMovie)
 		}
 		items = append(items, searchJSONItem{
 			Index:      i + 1,
-			Title:      r.GetDisplayTitle(),
-			Year:       r.GetYear(),
+			Title:      results[i].GetDisplayTitle(),
+			Year:       results[i].GetYear(),
 			Type:       mediaType,
-			TmdbID:     r.ID,
-			Rating:     r.VoteAvg,
-			Popularity: r.Popularity,
-			Overview:   r.Overview,
-			PosterPath: r.PosterPath,
-			GenreIDs:   r.GenreIDs,
+			TmdbID:     results[i].ID,
+			Rating:     results[i].VoteAvg,
+			Popularity: results[i].Popularity,
+			Overview:   results[i].Overview,
+			PosterPath: results[i].PosterPath,
+			GenreIDs:   results[i].GenreIDs,
 		})
 	}
 
