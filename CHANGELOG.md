@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.97.0
+
+### Fixed
+- **`run.ps1` parser failure on Windows PowerShell 5.1** — the script contained UTF-8 em-dashes inside double-quoted strings. Without a UTF-8 BOM, Windows PowerShell Desktop reads `.ps1` as Windows-1252, mis-decodes the bytes, and reports cascading errors like `Missing closing '}'` and `The Try statement is missing its Catch or Finally block.` All em-/en-dashes in `run.ps1`, `build.ps1`, and `install.ps1` are now ASCII `--`, and each script starts with a UTF-8 BOM.
+- **Removed misleading `📋 Gitmap` line from `movie update` preflight** in `updater/run.go`. The value referred to the previous release branch and was being printed before the new pull, looking like stale active state.
+
 ## v2.96.0
 
 ### Fixed
