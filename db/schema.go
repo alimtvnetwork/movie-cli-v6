@@ -1,25 +1,15 @@
-// schema.go — Full PascalCase schema creation and views.
+// schema.go — Schema orchestration via versioned migrations.
 package db
 
 import (
 	"github.com/alimtvnetwork/movie-cli-v4/apperror"
-
 	"github.com/alimtvnetwork/movie-cli-v4/version"
 )
 
-// migrateSchema creates all tables, indexes, views, and seed data.
+// migrateSchema runs all pending migrations and stamps the app version.
 func (d *DB) migrateSchema() error {
-	if err := d.createTables(); err != nil {
-		return apperror.Wrap("create tables", err)
-	}
-	if err := d.seedFileActions(); err != nil {
-		return apperror.Wrap("seed FileAction", err)
-	}
-	if err := d.seedDefaultConfig(); err != nil {
-		return apperror.Wrap("seed Config", err)
-	}
-	if err := d.createViews(); err != nil {
-		return apperror.Wrap("create views", err)
+	if err := d.runMigrations(); err != nil {
+		return apperror.Wrap("run migrations", err)
 	}
 	if err := d.SetConfig("AppVersion", version.Short()); err != nil {
 		return apperror.Wrap("stamp app version", err)
