@@ -109,19 +109,19 @@ func printUnifiedDefault(records []unifiedRecord) {
 
 	for i := range records {
 		status := "✅"
-		if r.IsReverted {
+		if records[i].IsReverted {
 			status = "↩️ "
 		}
 
-		icon := typeIcon(r.Type)
-		fmt.Printf("  %s %s %-14s  %s\n", status, icon, r.Type, r.Timestamp)
-		fmt.Printf("     %s\n", r.Detail)
+		icon := typeIcon(records[i].Type)
+		fmt.Printf("  %s %s %-14s  %s\n", status, icon, records[i].Type, records[i].Timestamp)
+		fmt.Printf("     %s\n", records[i].Detail)
 
-		if r.FromPath != "" {
-			fmt.Printf("     Path: %s → %s\n", r.FromPath, r.ToPath)
+		if records[i].FromPath != "" {
+			fmt.Printf("     Path: %s → %s\n", records[i].FromPath, records[i].ToPath)
 		}
-		if r.BatchID != "" {
-			fmt.Printf("     Batch: %s\n", r.BatchID[:minInt(8, len(r.BatchID))])
+		if records[i].BatchID != "" {
+			fmt.Printf("     Batch: %s\n", records[i].BatchID[:minInt(8, len(records[i].BatchID))])
 		}
 		fmt.Println()
 	}
