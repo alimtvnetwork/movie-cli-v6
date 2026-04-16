@@ -22,10 +22,11 @@ func executeUpdateWindows(repoPath, targetBinary string) error {
 	return runPowerShellScript(scriptPath)
 }
 
-// executeUpdateUnix runs the update via pwsh (if available) or direct commands.
+// executeUpdateUnix runs the update via pwsh.
 func executeUpdateUnix(repoPath, targetBinary string) error {
 	if !hasPwshWithRunPS1(repoPath) {
-		return executeUpdateDirect(repoPath, targetBinary)
+		runPS1 := filepath.Join(repoPath, "run.ps1")
+		return apperror.New("pwsh is required to run %s", runPS1)
 	}
 	scriptPath, err := writeUpdateScript(repoPath, targetBinary)
 	if err != nil {
@@ -42,52 +43,6 @@ func hasPwshWithRunPS1(repoPath string) bool {
 	runPS1 := filepath.Join(repoPath, "run.ps1")
 	_, statErr := os.Stat(runPS1)
 	return statErr == nil
-}
-
-// executeUpdateDirect runs the update pipeline directly without PowerShell.
-func executeUpdateDirect(repoPath, targetBinary string) error {
-	fmt.Println("📥 Pulling latest changes...")
-	pullOut, err := gitOutput(repoPath, "pull", "--ff-only")
-	if err != nil {
-		return apperror.Wrap("git pull failed", err)
-	}
-
-	if pullOut == "Already up to date." {
-		fmt.Println("✔ Already up to date")
-		return nil
-	}
-	fmt.Printf("  %s\n", pullOut)
-
-	fmt.Println("🔨 Building...")
-	outputPath := binaryOutputPath(repoPath)
-	if targetBinary != "" {
-		outputPath = targetBinary
-	}
-	if err := os.MkdirAll(filepath.Dir(outputPath), 0o755); err != nil {
-		return apperror.Wrap("cannot create target directory", err)
-	}
-
-	buildCmd := exec.Command("go", "build", "-ldflags=-s -w", "-o", outputPath, ".")
-	buildCmd.Dir = repoPath
-	buildCmd.Stdout = os.Stdout
-	buildCmd.Stderr = os.Stderr
-	if err := buildCmd.Run(); err != nil {
-		return apperror.Wrap("build failed", err)
-	}
-
-	fmt.Println("✅ Build complete")
-	return nil
-}
-
-// binaryOutputPath returns where the binary should be built.
-func binaryOutputPath(repoPath string) string {
-	binDir := filepath.Join(repoPath, "bin")
-	_ = os.MkdirAll(binDir, 0o755)
-	name := "movie"
-	if runtime.GOOS == "windows" {
-		name = "movie.exe"
-	}
-	return filepath.Join(binDir, name)
 }
 
 // writeUpdateScript generates a temp PowerShell script for the update.
@@ -142,23 +97,6 @@ if ($versionBinary -and (Test-Path $versionBinary)) {
 }
 Write-Host "  Version before: $oldVersion" -ForegroundColor Gray
 
-# Pull latest
-Set-Location $repoPath
-$pullOutput = git pull --ff-only 2>&1
-$pullText = ($pullOutput | ForEach-Object { "$_" }) -join [char]10
-
-if ($pullText -match "Already up to date") {
-    Write-Host ""
-    Write-Host "  Already up to date ($oldVersion)" -ForegroundColor Green
-    exit 0
-}
-
-Write-Host "  Pulled new changes" -ForegroundColor Cyan
-foreach ($line in $pullOutput) {
-    $text = "$line".Trim()
-    if ($text.Length -gt 0) { Write-Host "    $text" -ForegroundColor Gray }
-}
-
 # Wait for parent to release file handles
 Start-Sleep -Seconds 1.2
 
@@ -169,7 +107,8 @@ if (-not (Test-Path $runScript)) {
     exit 1
 }
 
-$deployArgs = @("-NoPull", "-Update")
+Write-Host "  Running update via $runScript" -ForegroundColor Cyan
+$deployArgs = @("-Update")
 if ($targetBinary) {
     $deployDir = Split-Path -Parent $targetBinary
     $targetName = Split-Path -Leaf $targetBinary
