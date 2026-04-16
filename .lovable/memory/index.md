@@ -26,6 +26,7 @@ Current version: v2.23.0. Spec resequenced: foundation 01-06, app at 08, issues 
 - [Suggestions](mem://suggestions/01-suggestions) — S01-S25 done, S26-S29 open (guideline fixes)
 - [Reliability report](mem://reports/01-reliability-risk-report) — Failure map, corrective actions
 - [No Split DB](mem://constraints/no-split-db) — All tables in single mahin.db
+- [Updater scope](mem://constraints/updater-scope) — Go updater never runs git checkout/pull/build; all git+build belong in run.ps1
 - [Data folder location](mem://features/data-folder-location) — Binary-relative data/ with single DB
 - [Timestamp bug](mem://issues/01-timestamp-bug) — ✅ Fixed: hardcoded "now" → RFC3339
 - [Duplicate TMDb fetch](mem://issues/02-duplicate-tmdb-fetch) — ✅ Fixed: shared helpers
