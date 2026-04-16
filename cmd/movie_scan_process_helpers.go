@@ -1,0 +1,165 @@
+// movie_scan_process_helpers.go — extracted helpers for processVideoFile.
+package cmd
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+
+	"github.com/alimtvnetwork/movie-cli-v4/cleaner"
+	"github.com/alimtvnetwork/movie-cli-v4/db"
+	"github.com/alimtvnetwork/movie-cli-v4/errlog"
+	"github.com/alimtvnetwork/movie-cli-v4/tmdb"
+)
+
+// isAlreadyScanned checks if a file is already in the DB and updates counters.
+func isAlreadyScanned(ctx *ScanContext, vf videoFile, result cleaner.Result) bool {
+	existing, searchErr := ctx.Database.SearchMedia(result.CleanTitle)
+	if searchErr != nil {
+		errlog.Warn("DB search error for '%s': %v", result.CleanTitle, searchErr)
+	}
+
+	for i := range existing {
+		if existing[i].OriginalFilePath != vf.FullPath {
+			continue
+		}
+		if ctx.UseTable {
+			printScanTableRow(buildMediaTableRow(ctx.TotalFiles, &db.Media{
+				OriginalFileName: vf.Name,
+				CleanTitle:       result.CleanTitle,
+				Year:             result.Year,
+				Type:             result.Type,
+			}, "skipped"))
+		}
+		if !ctx.UseTable {
+			fmt.Println("     ⏩ Already in database, skipping")
+		}
+		ctx.Skipped++
+		incrementTypeCount(ctx, result.Type)
+		return true
+	}
+	return false
+}
+
+// incrementTypeCount bumps MovieCount or TVCount based on media type.
+func incrementTypeCount(ctx *ScanContext, mediaType string) {
+	if mediaType == string(db.MediaTypeMovie) {
+		ctx.MovieCount++
+		return
+	}
+	ctx.TVCount++
+}
+
+// logStatError logs a file stat error with appropriate message per spec.
+func logStatError(path string, err error) {
+	switch {
+	case os.IsNotExist(err):
+		errlog.Error("❌ File not found: %s", path)
+	case os.IsPermission(err):
+		errlog.Error("❌ Permission denied: %s", path)
+	default:
+		errlog.Error("cannot stat file %s: %v", path, err)
+	}
+}
+
+// handleInsertError handles DB insert failure by attempting update if TmdbID exists.
+func handleInsertError(ctx *ScanContext, m *db.Media, insertErr error) {
+	if m.TmdbID == 0 {
+		errlog.Error("DB insert error for '%s': %v", m.Title, insertErr)
+		return
+	}
+
+	updateErr := ctx.Database.UpdateMediaByTmdbID(m)
+	if updateErr != nil {
+		errlog.Error("DB update error for '%s': %v", m.Title, updateErr)
+		return
+	}
+
+	if m.Genre == "" {
+		return
+	}
+
+	existing, _ := ctx.Database.GetMediaByTmdbID(m.TmdbID)
+	if existing != nil {
+		ctx.Database.ReplaceMediaGenres(existing.ID, m.Genre)
+	}
+}
+
+// trackScanAction records scan_add in action_history for undo support.
+func trackScanAction(ctx *ScanContext, result TrackScanResult) {
+	if result.InsertErr != nil || result.MediaID <= 0 || ctx.BatchID == "" {
+		return
+	}
+	detail := fmt.Sprintf("Scan added: %s (%s)", result.Media.CleanTitle, result.FullPath)
+	ctx.Database.InsertActionSimple(db.ActionSimpleInput{
+		FileAction: db.FileActionScanAdd, MediaID: result.MediaID,
+		Detail: detail, BatchID: ctx.BatchID,
+	})
+}
+
+// downloadThumbnail downloads poster from TMDb and saves to output + data dirs.
+func downloadThumbnail(input ThumbnailInput) {
+	if input.PosterPath == "" {
+		return
+	}
+
+	slug := cleaner.ToSlug(input.Media.CleanTitle)
+	if input.Media.Year > 0 {
+		slug += "-" + strconv.Itoa(input.Media.Year)
+	}
+	thumbFileName := slug + "-" + strconv.Itoa(input.Media.TmdbID) + ".jpg"
+
+	thumbDir := filepath.Join(input.OutputDir, "thumbnails")
+	if mkdirErr := os.MkdirAll(thumbDir, 0755); mkdirErr != nil {
+		logMkdirError(thumbDir, mkdirErr)
+		return
+	}
+
+	thumbPath := filepath.Join(thumbDir, thumbFileName)
+	if dlErr := input.Client.DownloadPoster(input.PosterPath, thumbPath); dlErr != nil {
+		logPosterDownloadError(input.Media.CleanTitle, dlErr)
+		return
+	}
+
+	input.Media.ThumbnailPath = "thumbnails/" + thumbFileName
+	fmt.Println("     🖼️  Thumbnail saved")
+	copyThumbnailToDataDir(input.Database.BasePath, thumbPath, thumbFileName)
+}
+
+// logMkdirError logs directory creation failure with appropriate message.
+func logMkdirError(dir string, err error) {
+	if os.IsPermission(err) {
+		errlog.Warn("⚠️ Cannot create thumbnail dir — skipping poster download")
+		return
+	}
+	errlog.Error("cannot create thumbnail dir %s: %v", dir, err)
+}
+
+// logPosterDownloadError logs poster download failure per spec §1.4.
+func logPosterDownloadError(title string, dlErr error) {
+	if errors.Is(dlErr, tmdb.ErrTimeout) || errors.Is(dlErr, tmdb.ErrNetworkError) {
+		errlog.Warn("⚠️ Poster download timed out — skipping for '%s'", title)
+		return
+	}
+	errlog.Warn("thumbnail download failed for '%s': %v", title, dlErr)
+}
+
+// copyThumbnailToDataDir copies a thumbnail to the database data directory for REST access.
+func copyThumbnailToDataDir(basePath, thumbPath, fileName string) {
+	dbThumbDir := filepath.Join(basePath, "thumbnails")
+	if mkErr := os.MkdirAll(dbThumbDir, 0755); mkErr != nil {
+		return
+	}
+
+	src, rErr := os.ReadFile(thumbPath)
+	if rErr != nil {
+		return
+	}
+
+	dbThumbPath := filepath.Join(dbThumbDir, fileName)
+	if wErr := os.WriteFile(dbThumbPath, src, 0644); wErr != nil {
+		errlog.Warn("could not copy thumbnail to data dir: %v", wErr)
+	}
+}

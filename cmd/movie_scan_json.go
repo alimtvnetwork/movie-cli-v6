@@ -1,0 +1,106 @@
+// movie_scan_json.go — JSON metadata file generation during scan
+//
+// -- Shared helper exported from this file --
+//
+//	writeScanJSON(basePath, media)  — write per-item JSON metadata to data/json/<slug>/
+//
+// Consumers: movie_scan.go (called after each successful scan+metadata fetch)
+//
+// Do NOT duplicate JSON metadata writing elsewhere — use writeScanJSON.
+package cmd
+
+import (
+	"github.com/alimtvnetwork/movie-cli-v4/apperror"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
+	"time"
+
+	"github.com/alimtvnetwork/movie-cli-v4/cleaner"
+	"github.com/alimtvnetwork/movie-cli-v4/db"
+)
+
+// scanMediaJSON is the JSON representation written to disk.
+type scanMediaJSON struct {
+	Title            string  `json:"title"`
+	CleanTitle       string  `json:"clean_title"`
+	Type             string  `json:"type"`
+	ImdbID           string  `json:"imdb_id,omitempty"`
+	Description      string  `json:"description,omitempty"`
+	Genre            string  `json:"genre,omitempty"`
+	Director         string  `json:"director,omitempty"`
+	CastList         string  `json:"cast_list,omitempty"`
+	ThumbnailPath    string  `json:"thumbnail_path,omitempty"`
+	OriginalFileName string  `json:"original_file_name"`
+	OriginalFilePath string  `json:"original_file_path"`
+	CurrentFilePath  string  `json:"current_file_path"`
+	FileExtension    string  `json:"file_extension"`
+	GeneratedAt      string  `json:"generated_at"`
+	ImdbRating       float64 `json:"imdb_rating,omitempty"`
+	TmdbRating       float64 `json:"tmdb_rating,omitempty"`
+	Popularity       float64 `json:"popularity,omitempty"`
+	FileSize         int64   `json:"file_size"`
+	Year             int     `json:"year,omitempty"`
+	TmdbID           int     `json:"tmdb_id,omitempty"`
+}
+
+// writeMediaJSON writes a JSON metadata file for the given media record.
+// Files are saved to <basePath>/json/movie/<slug>.json or json/tv/<slug>.json.
+func writeMediaJSON(basePath string, m *db.Media) error {
+	subDir := db.JSONSubDir(m.Type)
+	slug := mediaSlug(m)
+
+	dir := filepath.Join(basePath, "json", subDir)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return apperror.Wrap("cannot create json dir", err)
+	}
+
+	data := toScanMediaJSON(m)
+	jsonPath := filepath.Join(dir, slug+".json")
+
+	if err := writeJSONFile(jsonPath, data); err != nil {
+		return err
+	}
+
+	fmt.Printf("     📝 JSON metadata saved: %s\n", jsonPath)
+	return nil
+}
+
+func mediaSlug(m *db.Media) string {
+	slug := cleaner.ToSlug(m.CleanTitle)
+	if m.Year > 0 {
+		slug += "-" + strconv.Itoa(m.Year)
+	}
+	return slug
+}
+
+func toScanMediaJSON(m *db.Media) scanMediaJSON {
+	return scanMediaJSON{
+		Title: m.Title, CleanTitle: m.CleanTitle,
+		Year: m.Year, Type: m.Type, TmdbID: m.TmdbID, ImdbID: m.ImdbID,
+		Description: m.Description, ImdbRating: m.ImdbRating,
+		TmdbRating: m.TmdbRating, Popularity: m.Popularity,
+		Genre: m.Genre, Director: m.Director, CastList: m.CastList,
+		ThumbnailPath: m.ThumbnailPath, OriginalFileName: m.OriginalFileName,
+		OriginalFilePath: m.OriginalFilePath, CurrentFilePath: m.CurrentFilePath,
+		FileExtension: m.FileExtension, FileSize: m.FileSize,
+		GeneratedAt: time.Now().UTC().Format(time.RFC3339),
+	}
+}
+
+func writeJSONFile(path string, data scanMediaJSON) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return apperror.Wrap("cannot create json file", err)
+	}
+	defer f.Close()
+
+	enc := json.NewEncoder(f)
+	enc.SetIndent("", "  ")
+	if err := enc.Encode(data); err != nil {
+		return apperror.Wrap("cannot write json", err)
+	}
+	return nil
+}
