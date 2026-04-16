@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
  Build, deploy, and run movie CLI from the repo root.
 .DESCRIPTION
@@ -396,7 +396,7 @@ function Test-SourceFiles {
         "go.sum"
     )
 
-    # Required source directories — each must contain at least one .go file.
+    # Required source directories -- each must contain at least one .go file.
     # We do NOT hardcode every file name because the file set changes often
     # and a brittle list causes false "missing source files" failures.
     $requiredDirs = @(
@@ -553,7 +553,7 @@ function Build-Binary {
         if ($verifyExit -eq 0) {
             Write-Success "Verified: $("$verifyOutput".Trim())"
         } else {
-            Write-Warn "Binary built but 'version' command failed — may be OK if not implemented yet"
+            Write-Warn "Binary built but 'version' command failed -- may be OK if not implemented yet"
         }
 
         return $outputPath
@@ -609,7 +609,7 @@ function Deploy-Binary {
             Rename-Item -Path $destFile -NewName "$binaryName.bak" -Force
             Write-Info "Backed up existing binary"
         } catch {
-            Write-ErrorAndExit "Could not back up existing binary: $_ — cannot guarantee rollback safety"
+            Write-ErrorAndExit "Could not back up existing binary: $_ -- cannot guarantee rollback safety"
         }
     }
 
@@ -635,7 +635,7 @@ function Deploy-Binary {
         $chmodExit = $LASTEXITCODE
         $ErrorActionPreference = $prevPref
         if ($chmodExit -ne 0) {
-            Write-Warn "chmod +x failed on $destFile (exit $chmodExit) — binary may not be executable"
+            Write-Warn "chmod +x failed on $destFile (exit $chmodExit) -- binary may not be executable"
         }
     }
 
@@ -673,7 +673,7 @@ function Deploy-Binary {
     if ($verifyExit -eq 0) {
         Write-Success "Verified deployed binary: $("$verifyOutput".Trim())"
     } else {
-        Write-Warn "Deployed but 'version' check failed — may be OK"
+        Write-Warn "Deployed but 'version' check failed -- may be OK"
     }
 
     if (Test-Path $deployChangelog) {
@@ -816,7 +816,7 @@ function Invoke-Tests {
 Show-Banner
 $config = Load-Config
 
-# Test mode — run tests and exit
+# Test mode -- run tests and exit
 if ($Test) {
     Invoke-Tests
     exit 0
@@ -845,7 +845,7 @@ if (-not $NoDeploy) {
     $deployedBinary = $builtBinary
 }
 
-# PATH sync — if deployed binary differs from PATH binary, sync it (like gitmap-v2)
+# PATH sync -- if deployed binary differs from PATH binary, sync it (like gitmap-v2)
 $activeCmd = Get-Command movie -ErrorAction SilentlyContinue
 if ($activeCmd -and $activeCmd.Source -and (Test-Path $activeCmd.Source) -and $deployedBinary -and (Test-Path $deployedBinary)) {
     $activePath = (Resolve-Path $activeCmd.Source).Path

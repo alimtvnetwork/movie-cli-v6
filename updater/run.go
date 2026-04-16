@@ -70,10 +70,6 @@ func printBootstrapInfo(repoPath string) error {
 // preflightRepo validates the repo is clean and prints gitmap version info.
 // It does NOT perform git checkout — run.ps1 handles fetch/pull/build/deploy.
 func preflightRepo(repoPath string) error {
-	if gm, gmErr := readGitMapLatest(repoPath); gmErr == nil && gm.Version != "" {
-		fmt.Printf("📋 Gitmap: %s (branch: %s)\n", gm.Version, gm.Branch)
-	}
-
 	dirty, err := gitOutput(repoPath, "status", "--porcelain")
 	if err != nil {
 		return apperror.Wrap("cannot check git status", err)
