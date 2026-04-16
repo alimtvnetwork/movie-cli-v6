@@ -28,9 +28,9 @@ func collectUnifiedRecords(database *db.DB) []unifiedRecord {
 	// Apply --since filter
 	if historySince != "" {
 		var filtered []unifiedRecord
-		for _, r := range records {
-			if r.Timestamp >= historySince {
-				filtered = append(filtered, r)
+		for i := range records {
+			if records[i].Timestamp >= historySince {
+				filtered = append(filtered, records[i])
 			}
 		}
 		records = filtered
@@ -77,7 +77,8 @@ func collectActionRecords(database *db.DB, records []unifiedRecord) []unifiedRec
 	case "scan":
 		adds, _ := database.ListActionsByType(db.FileActionScanAdd, historyLimit)
 		removes, _ := database.ListActionsByType(db.FileActionScanRemove, historyLimit)
-		actions = append(adds, removes...)
+		actions = adds
+		actions = append(actions, removes...)
 	case "delete":
 		actions, err = database.ListActionsByType(db.FileActionDelete, historyLimit)
 	case "popout":

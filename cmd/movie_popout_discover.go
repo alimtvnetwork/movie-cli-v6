@@ -17,9 +17,9 @@ import (
 func discoverNestedVideos(rootDir string, maxDepth int) []popoutItem {
 	var items []popoutItem
 
-	_ = filepath.Walk(rootDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return nil
+	_ = filepath.Walk(rootDir, func(path string, info os.FileInfo, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
 		}
 		return processWalkEntry(WalkEntryInput{
 			RootDir: rootDir, Path: path, Info: info, MaxDepth: maxDepth, Items: &items,
@@ -32,7 +32,7 @@ func discoverNestedVideos(rootDir string, maxDepth int) []popoutItem {
 func processWalkEntry(input WalkEntryInput) error {
 	rel, relErr := filepath.Rel(input.RootDir, input.Path)
 	if relErr != nil {
-		return nil
+		return relErr
 	}
 	depth := strings.Count(rel, string(os.PathSeparator))
 
@@ -87,7 +87,7 @@ func executePopout(database *db.DB, items []popoutItem, batchID string) (success
 
 		mediaID := trackPopoutMove(database, item, batchID)
 		detail := fmt.Sprintf("Popped out: %s from %s/", item.cleanName, item.subDir)
-		database.InsertActionSimple(db.ActionSimpleInput{
+		_ = database.InsertActionSimple(db.ActionSimpleInput{
 			FileAction: db.FileActionPopout, MediaID: mediaID,
 			Detail: detail, BatchID: batchID,
 		})

@@ -143,7 +143,7 @@ func (d *DB) DeleteMediaByIDs(ids []int64) (int, error) {
 	deleted := 0
 	for _, id := range ids {
 		if _, err := tx.Exec("DELETE FROM Media WHERE MediaId = ?", id); err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			return deleted, err
 		}
 		deleted++

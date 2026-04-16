@@ -151,11 +151,11 @@ func executeAndCleanupPopout(mc MoveContext, items []popoutItem, rootDir string)
 func printPopoutPreview(items []popoutItem) {
 	fmt.Printf("\n🎬 Movie Popout — %d files found in subfolders\n\n", len(items))
 	fmt.Println("  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-	for i, item := range items {
-		yearStr := formatYearSuffix(item.result.Year)
-		fmt.Printf("\n  %d. %s%s  [%s]\n", i+1, item.result.CleanTitle, yearStr, humanSize(item.size))
-		fmt.Printf("     From: %s\n", item.srcPath)
-		fmt.Printf("     To:   %s\n", item.destPath)
+	for i := range items {
+		yearStr := formatYearSuffix(items[i].result.Year)
+		fmt.Printf("\n  %d. %s%s  [%s]\n", i+1, items[i].result.CleanTitle, yearStr, humanSize(items[i].size))
+		fmt.Printf("     From: %s\n", items[i].srcPath)
+		fmt.Printf("     To:   %s\n", items[i].destPath)
 	}
 	fmt.Println("\n  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 }

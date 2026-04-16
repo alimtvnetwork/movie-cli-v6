@@ -69,7 +69,7 @@ func applyMediaUpdate(field MediaUpdateField) {
 	switch field.Key {
 	case "genre":
 		if genreStr, ok := field.Val.(string); ok {
-			field.Database.ReplaceMediaGenres(field.ID, genreStr)
+			_ = field.Database.ReplaceMediaGenres(field.ID, genreStr)
 		}
 	case "title", "director", "description", "tagline":
 		if _, execErr := field.Database.Exec("UPDATE Media SET "+field.Key+" = ?, UpdatedAt = datetime('now') WHERE MediaId = ?", field.Val, field.ID); execErr != nil {
@@ -132,9 +132,7 @@ func buildReportData(items []db.Media, port int) htmlReportData {
 func buildHTMLReportItem(m db.Media) htmlReportItem {
 	var genres []string
 	if m.Genre != "" {
-		for _, g := range splitGenres(m.Genre) {
-			genres = append(genres, g)
-		}
+		genres = append(genres, splitGenres(m.Genre)...)
 	}
 	thumbSrc := ""
 	if m.ThumbnailPath != "" {

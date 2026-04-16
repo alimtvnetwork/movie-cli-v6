@@ -22,22 +22,22 @@ func printSearchResultsTable(results []tmdb.SearchResult) {
 		strings.Repeat("─", 6),
 		strings.Repeat("─", 6))
 
-	for i, r := range results {
+	for i := range results {
 		if i >= 15 {
 			break
 		}
-		title := truncate(r.GetDisplayTitle(), 35)
-		year := r.GetYear()
+		title := truncate(results[i].GetDisplayTitle(), 35)
+		year := results[i].GetYear()
 		if year == "" {
 			year = "  -   "
 		}
-		mediaType := db.TypeLabel(r.MediaType)
+		mediaType := db.TypeLabel(results[i].MediaType)
 		rating := "   -  "
-		if r.VoteAvg > 0 {
-			rating = fmt.Sprintf("%5.1f ", r.VoteAvg)
+		if results[i].VoteAvg > 0 {
+			rating = fmt.Sprintf("%5.1f ", results[i].VoteAvg)
 		}
 		fmt.Printf("  %-3d │ %-35s │ %-6s │ %-8s │ %s│ %6d\n",
-			i+1, title, year, mediaType, rating, r.ID)
+			i+1, title, year, mediaType, rating, results[i].ID)
 	}
 
 	fmt.Printf("  %s─┴─%s─┴─%s─┴─%s─┴─%s─┴─%s\n",
