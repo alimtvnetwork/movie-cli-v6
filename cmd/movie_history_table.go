@@ -30,7 +30,7 @@ func printHistoryTableUnified(records []unifiedRecord) {
 		strings.Repeat("─", dateW),
 		strings.Repeat("─", detailW))
 
-	for _, r := range records {
+	for i := range records {
 		status := "OK"
 		if r.IsReverted {
 			status = "Reverted"

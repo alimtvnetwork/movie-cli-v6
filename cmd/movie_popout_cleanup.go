@@ -24,8 +24,8 @@ func offerFolderCleanup(cc CleanupContext, rootDir string, items []popoutItem) {
 
 func collectPopoutFolders(rootDir string, items []popoutItem) []popoutFolderInfo {
 	subDirs := make(map[string]bool)
-	for _, item := range items {
-		subDirs[item.subDir] = true
+	for i := range items {
+		subDirs[items[i].subDir] = true
 	}
 
 	var folders []popoutFolderInfo

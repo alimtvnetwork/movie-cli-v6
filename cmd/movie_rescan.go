@@ -26,8 +26,8 @@ func regenerateReports(database *db.DB) {
 	}
 
 	dirMap := make(map[string][]db.Media)
-	for _, m := range allMedia {
-		if m.OriginalFilePath == "" {
+	for i := range allMedia {
+		if allMedia[i].OriginalFilePath == "" {
 			continue
 		}
 		scanDir := filepath.Dir(m.OriginalFilePath)
