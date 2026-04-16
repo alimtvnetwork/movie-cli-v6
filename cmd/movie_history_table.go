@@ -56,25 +56,3 @@ func printHistoryTableUnified(records []unifiedRecord) {
 
 	fmt.Printf("\n  Total: %d records\n\n", len(records))
 }
-
-// printHistoryTable is kept for backward compatibility (move-only table).
-func printHistoryTable(records []db.MoveRecord) {
-	var unified []unifiedRecord
-	for _, m := range records {
-		recType := "move"
-		if dirOf(m.FromPath) == dirOf(m.ToPath) {
-			recType = "rename"
-		}
-		unified = append(unified, unifiedRecord{
-			Source:     "move",
-			ID:         m.ID,
-			Type:       recType,
-			Detail:     fmt.Sprintf("%s → %s", m.OriginalFileName, m.NewFileName),
-			FromPath:   m.FromPath,
-			ToPath:     m.ToPath,
-			Timestamp:  m.MovedAt,
-			IsReverted: m.IsReverted,
-		})
-	}
-	printHistoryTableUnified(unified)
-}
