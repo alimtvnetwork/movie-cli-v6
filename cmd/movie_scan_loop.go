@@ -6,7 +6,6 @@ import (
 
 	"github.com/alimtvnetwork/movie-cli-v4/db"
 	"github.com/alimtvnetwork/movie-cli-v4/errlog"
-	"github.com/alimtvnetwork/movie-cli-v4/tmdb"
 )
 
 // runMainScanLoop processes all video files: detects removals, rescans existing, processes new.
