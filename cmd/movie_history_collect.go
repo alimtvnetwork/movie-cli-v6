@@ -28,7 +28,7 @@ func collectUnifiedRecords(database *db.DB) []unifiedRecord {
 	// Apply --since filter
 	if historySince != "" {
 		var filtered []unifiedRecord
-		for _, r := range records {
+		for i := range records {
 			if r.Timestamp >= historySince {
 				filtered = append(filtered, r)
 			}
