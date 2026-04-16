@@ -30,8 +30,8 @@ func regenerateReports(database *db.DB) {
 		if allMedia[i].OriginalFilePath == "" {
 			continue
 		}
-		scanDir := filepath.Dir(m.OriginalFilePath)
-		dirMap[scanDir] = append(dirMap[scanDir], m)
+		scanDir := filepath.Dir(allMedia[i].OriginalFilePath)
+		dirMap[scanDir] = append(dirMap[scanDir], allMedia[i])
 	}
 
 	for scanDir, items := range dirMap {
