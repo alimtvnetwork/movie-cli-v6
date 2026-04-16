@@ -26,8 +26,8 @@ func (d *DB) LinkMediaDirectors(mediaID int64, directorCSV string) error {
 
 // ReplaceMediaDirectors replaces all director links for a media entry.
 func (d *DB) ReplaceMediaDirectors(mediaID int64, directorCSV string) {
-	d.Exec("DELETE FROM MediaDirector WHERE MediaId = ?", mediaID)
-	d.LinkMediaDirectors(mediaID, directorCSV)
+	_, _ = d.Exec("DELETE FROM MediaDirector WHERE MediaId = ?", mediaID)
+	_ = d.LinkMediaDirectors(mediaID, directorCSV)
 }
 
 // DirectorsByMediaID returns comma-separated director names for a media entry.

@@ -81,7 +81,7 @@ func linkRescanRelations(database *db.DB, m *db.Media) {
 		return
 	}
 	if m.Genre != "" {
-		database.ReplaceMediaGenres(m.ID, m.Genre)
+		_ = database.ReplaceMediaGenres(m.ID, m.Genre)
 	}
 	if m.Director != "" {
 		database.ReplaceMediaDirectors(m.ID, m.Director)

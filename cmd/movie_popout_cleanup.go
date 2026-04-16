@@ -159,7 +159,7 @@ func removeFolder(input FolderRemoveInput) {
 	fmt.Printf("    🗑  Removed: %s/\n", input.DirName)
 	detail := fmt.Sprintf("Removed folder: %s/", input.DirName)
 	snapshot := fmt.Sprintf(`{"folder_path":"%s"}`, input.DirPath)
-	input.Database.InsertActionSimple(db.ActionSimpleInput{
+	_ = input.Database.InsertActionSimple(db.ActionSimpleInput{
 		FileAction: db.FileActionDelete, Snapshot: snapshot,
 		Detail: detail, BatchID: input.BatchID,
 	})

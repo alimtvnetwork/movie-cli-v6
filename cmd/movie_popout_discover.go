@@ -87,7 +87,7 @@ func executePopout(database *db.DB, items []popoutItem, batchID string) (success
 
 		mediaID := trackPopoutMove(database, item, batchID)
 		detail := fmt.Sprintf("Popped out: %s from %s/", item.cleanName, item.subDir)
-		database.InsertActionSimple(db.ActionSimpleInput{
+		_ = database.InsertActionSimple(db.ActionSimpleInput{
 			FileAction: db.FileActionPopout, MediaID: mediaID,
 			Detail: detail, BatchID: batchID,
 		})

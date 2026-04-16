@@ -180,7 +180,7 @@ func saveInfoMedia(database *db.DB, m *db.Media) {
 		return
 	}
 	if mediaID > 0 && m.Genre != "" {
-		database.LinkMediaGenres(mediaID, m.Genre)
+		_ = database.LinkMediaGenres(mediaID, m.Genre)
 	}
 }
 
@@ -199,6 +199,6 @@ func handleInfoInsertError(database *db.DB, m *db.Media, insertErr error) {
 	}
 	existing, _ := database.GetMediaByTmdbID(m.TmdbID)
 	if existing != nil {
-		database.ReplaceMediaGenres(existing.ID, m.Genre)
+		_ = database.ReplaceMediaGenres(existing.ID, m.Genre)
 	}
 }

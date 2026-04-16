@@ -69,7 +69,7 @@ func applyMediaUpdate(field MediaUpdateField) {
 	switch field.Key {
 	case "genre":
 		if genreStr, ok := field.Val.(string); ok {
-			field.Database.ReplaceMediaGenres(field.ID, genreStr)
+			_ = field.Database.ReplaceMediaGenres(field.ID, genreStr)
 		}
 	case "title", "director", "description", "tagline":
 		if _, execErr := field.Database.Exec("UPDATE Media SET "+field.Key+" = ?, UpdatedAt = datetime('now') WHERE MediaId = ?", field.Val, field.ID); execErr != nil {
