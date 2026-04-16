@@ -32,7 +32,7 @@ func discoverNestedVideos(rootDir string, maxDepth int) []popoutItem {
 func processWalkEntry(input WalkEntryInput) error {
 	rel, relErr := filepath.Rel(input.RootDir, input.Path)
 	if relErr != nil {
-		return nil
+		return relErr
 	}
 	depth := strings.Count(rel, string(os.PathSeparator))
 
