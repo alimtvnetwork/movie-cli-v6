@@ -10,8 +10,7 @@ import (
 )
 
 // runMainScanLoop processes all video files: detects removals, rescans existing, processes new.
-func runMainScanLoop(ctx *ScanContext, videoFiles []videoFile, cfg ScanLoopConfig,
-	jsonItems *[]scanJSONItem) int {
+func runMainScanLoop(ctx *ScanContext, videoFiles []videoFile, cfg ScanLoopConfig) int {
 	database := ctx.Database
 
 	existingMedia, _ := database.GetMediaByScanDir(cfg.ScanDir)

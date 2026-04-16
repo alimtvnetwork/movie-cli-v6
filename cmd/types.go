@@ -82,12 +82,13 @@ type HistoryLogInput struct {
 
 // ScanLoopConfig groups parameters for the main scan processing loop.
 type ScanLoopConfig struct {
-	Client  *tmdb.Client
-	ScanDir string
-	BatchID string
-	UseJSON bool
-	UseTable bool
-	HasTMDb bool
+	Client    *tmdb.Client
+	ScanDir   string
+	BatchID   string
+	UseJSON   bool
+	UseTable  bool
+	HasTMDb   bool
+	JSONItems *[]scanJSONItem
 }
 
 // ScanOutputOpts groups output format flags used during scan processing.

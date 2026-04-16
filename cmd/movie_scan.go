@@ -135,7 +135,8 @@ func executeScan(ctx *ScanContext, scanDir string, useJSON bool) (int, []scanJSO
 	removed := runMainScanLoop(ctx, videoFiles, ScanLoopConfig{
 		Client: ctx.Client, ScanDir: scanDir, BatchID: ctx.BatchID,
 		UseJSON: useJSON, UseTable: useTable, HasTMDb: ctx.HasTMDb,
-	}, &jsonItems)
+		JSONItems: &jsonItems,
+	})
 
 	if useTable {
 		printScanTableFooter()
