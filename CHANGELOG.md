@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.101.0
+
+### Added
+- **`movie rescan-failed` command** — selects every Media row where `TmdbId` is `NULL` or `0` and re-runs the lookup using the new `SearchWithFallback` chain (progressive trim → DuckDuckGo → IMDb id → TMDb `/find`). Supports `--limit N` to cap the batch size. After a successful pass it regenerates `report.html` and `summary.json` for affected scan dirs.
+- **`db.GetMediaWithMissingTmdbID`** query helper used by the new command.
+
+### Changed
+- **`rescanMediaEntry` (used by both `movie rescan` and `movie rescan-failed`) now calls `SearchWithFallback`** instead of the bare `SearchMulti`, so the existing `movie rescan` also benefits from the trim + IMDb fallback for entries with weak metadata.
+
 ## v2.100.0
 
 ### Fixed
