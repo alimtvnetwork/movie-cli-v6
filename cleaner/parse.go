@@ -18,18 +18,19 @@ var videoExtensions = map[string]bool{
 
 // patterns to remove from file names
 var junkPatterns = []*regexp.Regexp{
-	regexp.MustCompile(`(?i)\b(1080p|720p|480p|2160p|4k)\b`),
-	regexp.MustCompile(`(?i)\b(bluray|bdrip|brrip|webrip|web-dl|web\.dl|hdrip|dvdrip|dvdscr|hdtv|hdcam|cam|ts|tc)\b`),
-	regexp.MustCompile(`(?i)\b(x264|x265|h\.?264|h\.?265|hevc|aac|ac3|dts|mp3|flac|atmos|ddp?|dd[px]?\s*[257]\s*[01]|eac3|truehd|lpcm|opus)\b`),
-	regexp.MustCompile(`(?i)\b(rarbg|yts|yify|eztv|ettv|sparks|geckos|fgt|evo|ion10|cmrg|ntb|megusta|immortal|msubs?|pahe|mkvcinemas?|tamilrockers|yts\.mx)\b`),
-	regexp.MustCompile(`(?i)\b(extended|unrated|directors\.?cut|remastered|proper|rerip|internal)\b`),
-	regexp.MustCompile(`(?i)\b(multi|dual|eng|english|hindi|spanish|french|german|ita|tamil|telugu|malayalam|korean|japanese|chinese|arabic|bengali|kannada|marathi|punjabi|urdu)\b`),
-	regexp.MustCompile(`(?i)\b(sub|subs|subtitle|subtitles|esub|esubs|e-sub|e-subs|softcoded|hardcoded)\b`),
-	regexp.MustCompile(`(?i)\b(10bit|8bit|12bit|hdr|hdr10|hdr10plus|dv|dolby\.?vision|sdr)\b`),
-	regexp.MustCompile(`(?i)\b(amzn|nf|netflix|dsnp|disney|hmax|hulu|atvp|apple|pcok|peacock|pmtp|paramount|stan|crav|criterion|mubi)\b`),
-	regexp.MustCompile(`(?i)\b([57]\s*1|[27]\s*0)\b`),
+	regexp.MustCompile(`(?i)\b(1080p|720p|480p|2160p|4k|uhd|fhd|hd|sd)\b`),
+	regexp.MustCompile(`(?i)\b(bluray|blu-ray|bdrip|brrip|bdremux|remux|webrip|web-dl|web\.dl|webdl|web|hdrip|dvdrip|dvdscr|dvd|hdtv|pdtv|hdcam|cam|ts|tc|telesync|telecine|workprint|screener)\b`),
+	regexp.MustCompile(`(?i)\b(x264|x265|h\.?264|h\.?265|hevc|avc|xvid|divx|aac|ac3|dts(?:-?hd)?|dts-?ma|mp3|flac|atmos|ddp?|dd[px]?\s*[257]\s*[01]|ddp?5\.?1|eac3|truehd|lpcm|opus|vorbis|mp2)\b`),
+	regexp.MustCompile(`(?i)\b(rarbg|yts|yify|eztv|ettv|sparks|geckos|fgt|evo|ion10|cmrg|ntb|megusta|immortal|msubs?|pahe|mkvcinemas?|tamilrockers|yts\.mx|jhs|ds4k|ds4k\.jhs|hq|hqcam|psa|qxr|kogi|deflate|ntg|edith|amiable|chd|wiki|fraternity|publichd|silence|tigole|joy|qx|axxo|dimension|lol|killers|fov|ds4k\b)\b`),
+	regexp.MustCompile(`(?i)\b(extended|unrated|directors\.?cut|directors|remastered|proper|rerip|internal|repack|theatrical|imax|criterion\.?collection|anniversary|edition|complete|final\.?cut)\b`),
+	regexp.MustCompile(`(?i)\b(multi|dual|eng|english|hindi|hin|spanish|spa|french|fra|german|ger|ita|italian|tamil|tam|telugu|tel|malayalam|mal|korean|kor|japanese|jap|chinese|chi|arabic|ara|bengali|ben|kannada|kan|marathi|mar|punjabi|pun|urdu|urd|portuguese|por|russian|rus|turkish|tur|vietnamese|vie|thai|polish|dutch|swedish|norwegian|danish|finnish)\b`),
+	regexp.MustCompile(`(?i)\b(sub|subs|subbed|subtitle|subtitles|esub|esubs|e-sub|e-subs|msub|msubs|softcoded|hardcoded|softsub|hardsub)\b`),
+	regexp.MustCompile(`(?i)\b(10bit|8bit|12bit|10-bit|8-bit|hdr|hdr10|hdr10\+?|hdr10plus|dv|dovi|dolby\.?vision|sdr|imax\.enhanced)\b`),
+	regexp.MustCompile(`(?i)\b(amzn|nf|netflix|dsnp|disney|disney\+?|hmax|hbomax|hbo|hulu|atvp|apple|appletv|pcok|peacock|pmtp|paramount|paramount\+?|stan|crav|criterion|mubi|sho|showtime|starz|max)\b`),
+	regexp.MustCompile(`(?i)\b([57]\s*1|[27]\s*0|5\.1|7\.1|2\.0)\b`),
 	regexp.MustCompile(`\[.*?\]`),
 	regexp.MustCompile(`\([^)]*\)`),
+	regexp.MustCompile(`\{[^}]*\}`),
 }
 
 var yearInParens = regexp.MustCompile(`\((\d{4})\)`)
