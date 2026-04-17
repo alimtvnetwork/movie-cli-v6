@@ -84,9 +84,19 @@ func Clean(filename string) Result {
 	// Replace year in parens with bare year before junk removal
 	cleaned = yearInParens.ReplaceAllString(cleaned, "$1")
 
-	// Remove junk patterns
-	for _, p := range junkPatterns {
-		cleaned = p.ReplaceAllString(cleaned, "")
+	// Cut at first " - " separator if right side is mostly junk/release-group
+	if parts := dashSeparator.Split(cleaned, 2); len(parts) == 2 {
+		cleaned = cutAtDashKeepingTitle(parts[0], parts[1], year)
+	}
+
+	// Collapse duplicate years ("2025 2025" -> "2025")
+	cleaned = duplicateYear.ReplaceAllString(cleaned, "$1")
+
+	// Remove junk patterns (two passes to catch tokens revealed after first pass)
+	for pass := 0; pass < 2; pass++ {
+		for _, p := range junkPatterns {
+			cleaned = p.ReplaceAllString(cleaned, "")
+		}
 	}
 
 	// Clean up extra spaces
