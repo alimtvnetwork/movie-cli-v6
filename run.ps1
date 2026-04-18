@@ -93,12 +93,28 @@ function Write-ErrorAndExit {
 }
 
 function Resolve-DeployTarget {
-    if (-not $TargetBinaryPath) {
+    $candidate = $TargetBinaryPath
+
+    # In update mode, when no explicit target was provided (legacy worker call),
+    # fall back to the active 'movie' on PATH so we always replace the binary
+    # the user is actually running -- not whatever powershell.json's deployPath
+    # happens to point at. This is the single fix that breaks the loop where
+    # PATH points at one drive (E:\bin-run) but deployPath points at another
+    # (D:\bin-run), leaving the active binary frozen at an old version forever.
+    if (-not $candidate -and $Update) {
+        $activeCmd = Get-Command movie -ErrorAction SilentlyContinue
+        if ($activeCmd -and $activeCmd.Source -and (Test-Path $activeCmd.Source)) {
+            $candidate = $activeCmd.Source
+            Write-Info "Update mode: no -TargetBinaryPath provided; using active PATH binary: $candidate"
+        }
+    }
+
+    if (-not $candidate) {
         return $null
     }
-    $resolvedTarget = $TargetBinaryPath
+    $resolvedTarget = $candidate
     try {
-        $resolvedTarget = (Resolve-Path -LiteralPath $TargetBinaryPath -ErrorAction Stop).Path
+        $resolvedTarget = (Resolve-Path -LiteralPath $candidate -ErrorAction Stop).Path
     } catch {
     }
     $targetParent = Split-Path -Parent $resolvedTarget
