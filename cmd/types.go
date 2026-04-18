@@ -83,10 +83,10 @@ type HistoryLogInput struct {
 // ScanLoopConfig groups parameters for the main scan processing loop.
 type ScanLoopConfig struct {
 	Client    *tmdb.Client
-	JSONItems *[]scanJSONItem
+	JsonItems *[]scanJsonItem
 	ScanDir   string
 	BatchID   string
-	UseJSON   bool
+	UseJson   bool
 	UseTable  bool
 	HasTMDb   bool
 }
@@ -94,7 +94,7 @@ type ScanLoopConfig struct {
 // ScanOutputOpts groups output format flags used during scan processing.
 type ScanOutputOpts struct {
 	UseTable bool
-	UseJSON  bool
+	UseJson  bool
 }
 
 // DryRunCounters groups counter pointers for dry-run scan output.
@@ -227,21 +227,21 @@ type FinalizeScanInput struct {
 	ScanDir   string
 	OutputDir string
 	Creds     tmdbCredentials
-	JSONItems []scanJSONItem
+	JsonItems []scanJsonItem
 	Removed   int
-	UseJSON   bool
+	UseJson   bool
 }
 
 // DryRunInput groups parameters for dry-run scan processing.
 type DryRunInput struct {
 	VideoFiles []videoFile
-	UseJSON    bool
+	UseJson    bool
 	UseTable   bool
 }
 
 // DryRunOutput groups mutable output pointers for dry-run scan results.
 type DryRunOutput struct {
-	JSONItems  *[]scanJSONItem
+	JsonItems  *[]scanJsonItem
 	TotalFiles *int
 	MovieCount *int
 	TVCount    *int

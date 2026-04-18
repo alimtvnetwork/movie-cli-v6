@@ -49,7 +49,7 @@ type scanMediaJSON struct {
 // writeMediaJSON writes a JSON metadata file for the given media record.
 // Files are saved to <basePath>/json/movie/<slug>.json or json/tv/<slug>.json.
 func writeMediaJSON(basePath string, m *db.Media) error {
-	subDir := db.JSONSubDir(m.Type)
+	subDir := db.JsonSubDir(m.Type)
 	slug := mediaSlug(m)
 
 	dir := filepath.Join(basePath, "json", subDir)

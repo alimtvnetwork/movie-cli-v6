@@ -15,7 +15,7 @@ import (
 type scanJSONOutput struct {
 	ScannedFolder string         `json:"scanned_folder"`
 	ScannedAt     string         `json:"scanned_at"`
-	Items         []scanJSONItem `json:"items"`
+	Items         []scanJsonItem `json:"items"`
 	TotalFiles    int            `json:"total_files"`
 	Movies        int            `json:"movies"`
 	TVShows       int            `json:"tv_shows"`
@@ -23,8 +23,8 @@ type scanJSONOutput struct {
 	DryRun        bool           `json:"dry_run"`
 }
 
-// scanJSONItem is one item in the JSON output.
-type scanJSONItem struct {
+// scanJsonItem is one item in the JSON output.
+type scanJsonItem struct {
 	FileName   string  `json:"file_name"`
 	FilePath   string  `json:"file_path"`
 	CleanTitle string  `json:"clean_title"`
@@ -37,10 +37,10 @@ type scanJSONItem struct {
 }
 
 // buildDryRunJSONItems creates JSON items from video files in dry-run mode.
-func buildDryRunJSONItems(videoFiles []videoFile) (items []scanJSONItem, movies, tvShows int) {
+func buildDryRunJSONItems(videoFiles []videoFile) (items []scanJsonItem, movies, tvShows int) {
 	for _, vf := range videoFiles {
 		result := cleaner.Clean(vf.Name)
-		items = append(items, scanJSONItem{
+		items = append(items, scanJsonItem{
 			FileName:   vf.Name,
 			FilePath:   vf.FullPath,
 			CleanTitle: result.CleanTitle,
@@ -57,9 +57,9 @@ func buildDryRunJSONItems(videoFiles []videoFile) (items []scanJSONItem, movies,
 	return
 }
 
-// buildMediaJSONItem creates a JSON item from a processed Media record.
-func buildMediaJSONItem(m *db.Media, status string) scanJSONItem {
-	return scanJSONItem{
+// buildMediaJsonItem creates a JSON item from a processed Media record.
+func buildMediaJsonItem(m *db.Media, status string) scanJsonItem {
+	return scanJsonItem{
 		FileName:   m.OriginalFileName,
 		FilePath:   m.CurrentFilePath,
 		CleanTitle: m.CleanTitle,
@@ -72,8 +72,8 @@ func buildMediaJSONItem(m *db.Media, status string) scanJSONItem {
 	}
 }
 
-// printScanJSON writes the full scan result as JSON to stdout.
-func printScanJSON(scanDir string, items []scanJSONItem, stats ScanStats) {
+// printScanJson writes the full scan result as JSON to stdout.
+func printScanJson(scanDir string, items []scanJsonItem, stats ScanStats) {
 	output := scanJSONOutput{
 		ScannedFolder: scanDir,
 		ScannedAt:     time.Now().UTC().Format(time.RFC3339),

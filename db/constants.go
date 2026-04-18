@@ -41,8 +41,8 @@ func (ws WatchStatus) String() string {
 	return string(ws)
 }
 
-// JSONSubDir returns the JSON output subdirectory name for a media type.
-func JSONSubDir(mediaType string) string {
+// JsonSubDir returns the JSON output subdirectory name for a media type.
+func JsonSubDir(mediaType string) string {
 	if mediaType == string(MediaTypeTV) {
 		return string(MediaTypeTV)
 	}

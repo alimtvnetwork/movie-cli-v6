@@ -141,7 +141,7 @@ func linkGenresOnInsert(database *db.DB, mediaID int64, genre string) {
 func printSavedSummary(m *db.Media) {
 	typeIcon := db.TypeIcon(m.Type)
 	typeLabel := db.TypeLabel(m.Type)
-	folder := db.JSONSubDir(m.Type)
+	folder := db.JsonSubDir(m.Type)
 
 	fmt.Println()
 	fmt.Println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
