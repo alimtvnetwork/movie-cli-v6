@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.124.0
+
+### Documentation
+- **Full failure-chain RCA published** for the v2.97.0 → v2.121.0 stale-handoff loop. Documents all 5 independent bugs (dual `bin-run` dirs, deployPath trust, stale-worker `-TargetBinaryPath` gap, PATH-sync loop attacking the live parent, stderr-as-NativeCommandError), why v2.118.0/v2.119.0/v2.120.0 fixes were invisible in production, the v2.121.0 root-cause fix, the v2.122.0 `self-replace` bootstrap, and the v2.123.0 output polish. Added as `spec/09-app-issues/08-updater-stale-handoff-loop-full-rca.md` and mirrored to `.lovable/memory/issues/07-updater-stale-handoff-loop-full-rca.md`. Issue tracker overview updated.
+
 ## v2.122.0
 
 ### Added
