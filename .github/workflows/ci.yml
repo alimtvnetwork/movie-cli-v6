@@ -67,6 +67,26 @@ jobs:
           version: v1.64.8
           args: --timeout=5m
 
+      - name: Acronym MixedCaps guard
+        if: needs.sha-check.outputs.already-built != 'true'
+        run: |
+          # Enforce spec/01-coding-guidelines/.../09-acronym-naming.md:
+          # No identifier may contain IMDb|TMDb|API|HTTP|URL|JSON|SQL|HTML|XML
+          # immediately followed by another uppercase letter.
+          # Allowlist: trailing-initialism short locals (imdbID, tmdbID, *URL).
+          set -e
+          ALLOWLIST='\b(imdbID|tmdbID|imgURL|reqURL|posterURL|baseURL|apiURL|fullURL|targetURL|rawURL|nextURL|prevURL|sourceURL|destURL|webhookURL|callbackURL|redirectURL|releaseURL|downloadURL|assetURL|repoURL|cloneURL|htmlURL|avatarURL|profileURL)\b'
+          PATTERN='\b(IMDb|TMDb|API|HTTP|URL|JSON|SQL|HTML|XML)[A-Z]'
+          violations=$(grep -rn -E "$PATTERN" --include='*.go' . | grep -vE "$ALLOWLIST" || true)
+          if [ -n "$violations" ]; then
+            echo "::error::Acronym MixedCaps violations found (see spec/01-coding-guidelines/03-coding-guidelines-spec/03-golang/09-acronym-naming.md)"
+            echo "$violations"
+            echo ""
+            echo "Fix: rename IMDb→Imdb, TMDb→Tmdb, API→Api, HTTP→Http, URL→Url, JSON→Json, SQL→Sql, HTML→Html, XML→Xml in identifiers."
+            exit 1
+          fi
+          echo "✅ No acronym MixedCaps violations."
+
   # ─── Vulnerability scan ────────────────────────────────────
   vulncheck:
     name: Vulnerability Scan
