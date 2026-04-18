@@ -1046,15 +1046,15 @@ $boxWidth = 40
 $innerWidth = $boxWidth - 4  # account for " | " and " |"
 
 Write-Host ""
-Write-Host " +$('=' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
+Write-Host "  +$('-' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
 # Title line
 $title = "All done!"
 $titlePad = $innerWidth - $title.Length
 if ($titlePad -lt 0) { $titlePad = 0 }
-Write-Host " | " -ForegroundColor DarkCyan -NoNewline
+Write-Host "  | " -ForegroundColor DarkCyan -NoNewline
 Write-Host $title -ForegroundColor Green -NoNewline
 Write-Host "$(' ' * $titlePad) |" -ForegroundColor DarkCyan
-Write-Host " +$('-' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
+Write-Host "  +$('-' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
 
 # Version info lines
 foreach ($vLine in $versionLines) {
@@ -1064,12 +1064,12 @@ foreach ($vLine in $versionLines) {
     }
     $linePad = $innerWidth - $displayLine.Length
     if ($linePad -lt 0) { $linePad = 0 }
-    Write-Host " | " -ForegroundColor DarkCyan -NoNewline
+    Write-Host "  | " -ForegroundColor DarkCyan -NoNewline
     Write-Host $displayLine -ForegroundColor Cyan -NoNewline
     Write-Host "$(' ' * $linePad) |" -ForegroundColor DarkCyan
 }
 
-Write-Host " +$('=' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
+Write-Host "  +$('-' * ($boxWidth - 2))+" -ForegroundColor DarkCyan
 Write-Host ""
 
 # -- Latest changelog ------------------------------------------
