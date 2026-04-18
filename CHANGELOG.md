@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.122.0
+
+### Added
+- **`movie self-replace` command** — one-shot bootstrap that atomically copies the freshly deployed binary over the active PATH `movie` using rename-first semantics (which works even while the active binary is loaded by another process on Windows). Defaults to `--from <deployPath>/<binaryName>` from `powershell.json` and `--to <active 'movie' on PATH>`. Use this to break out of any stuck-update loop where deployPath and the PATH-resolved binary live in different directories: `movie self-replace`. See `spec/09-app-issues/07-updater-deploypath-vs-path-mismatch.md`.
+
 ## v2.121.0
 
 ### Fixed
