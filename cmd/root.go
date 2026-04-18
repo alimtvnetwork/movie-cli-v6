@@ -62,6 +62,7 @@ func init() {
 		updateCmd,
 		updateRunnerCmd,
 		updateCleanupCmd,
+		selfReplaceCmd,
 		movieScanCmd,
 		movieLsCmd,
 		movieSearchCmd,
