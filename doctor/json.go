@@ -1,4 +1,4 @@
-// json.go — JSON emitter for `movie doctor --json`.
+// Package doctor — JSON emitter for `movie doctor --json`.
 // Output schema is stable for scripting/CI consumption.
 package doctor
 
