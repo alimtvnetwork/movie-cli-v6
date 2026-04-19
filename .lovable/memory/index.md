@@ -20,6 +20,8 @@ Zero nested if. Max 2 conditions per if. No else after return. Functions ≤15 l
 No magic strings — use constants/enums. No fmt.Errorf — use apperror.Wrap().
 Updater rule: in update mode, deploy target = active PATH binary, NEVER powershell.json deployPath.
 Updater rule: never write expected os.Remove failures on *-update-* artifacts to stderr (PowerShell turns it into NativeCommandError).
+American English ONLY in code/comments/CHANGELOG/spec — misspell uses US locale. behaviour→behavior, optimised→optimized, catalogued→cataloged, normalised→normalized, analyse→analyze, colour→color, centre→center, organise→organize, cancelled→canceled. See ci-cd playbook for full table.
+
 
 ## Memories
 - [Project overview](mem://01-project-overview) — Go CLI, command tree, architecture, file structure
