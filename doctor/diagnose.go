@@ -1,12 +1,12 @@
-// diagnose.go — diagnostic engine for `movie doctor`.
+// Package doctor provides the diagnostic engine for `movie doctor`.
 //
 // Surfaces the exact failure modes documented in
 // spec/09-app-issues/08-updater-stale-handoff-loop-full-rca.md:
 //
-//   1. Active PATH binary differs from powershell.json deployPath
-//   2. Deploy directory is missing from $PATH entirely
-//   3. Stale *-update-* handoff workers left on disk
-//   4. Active binary version is older than the freshly built one
+//  1. Active PATH binary differs from powershell.json deployPath
+//  2. Deploy directory is missing from $PATH entirely
+//  3. Stale *-update-* handoff workers left on disk
+//  4. Active binary version is older than the freshly built one
 //
 // Each Check returns a Finding so the report and the --fix path can act on
 // them uniformly.
@@ -27,20 +27,21 @@ const (
 
 // Finding is the result of one diagnostic check.
 type Finding struct {
-	ID       string
-	Title    string
-	Severity Severity
-	Detail   string
-	FixHint  string
+	ID        string
+	Title     string
+	Severity  Severity
+	Detail    string
+	FixHint   string
 	IsFixable bool
 }
 
 // Report bundles all findings from a Diagnose run.
+// Field order optimised for govet fieldalignment (strings first, slice last).
 type Report struct {
-	Findings []Finding
-	Source   string // resolved deploy source path
-	Target   string // resolved active PATH binary
+	Source    string
+	Target    string
 	DeployDir string
+	Findings  []Finding
 }
 
 // Diagnose runs every check and returns the aggregated report.
