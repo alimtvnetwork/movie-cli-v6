@@ -1,5 +1,9 @@
 // Package doctor — JSON emitter for `movie doctor --json`.
 // Output schema is stable for scripting/CI consumption.
+//
+// Naming: this file follows spec/01-coding-guidelines/.../09-acronym-naming.md
+// (project-specific MixedCaps rule). `JSON` becomes `Json` in identifiers;
+// the user-facing flag and JSON wire format are unchanged.
 package doctor
 
 import (
@@ -7,21 +11,21 @@ import (
 	"fmt"
 )
 
-// JSONReport is the stable wire-format for `movie doctor --json`.
+// JsonReport is the stable wire-format for `movie doctor --json`.
 // Field names are snake_case for cross-language consumers.
 // Field order optimized for govet fieldalignment (strings, slice, bools last).
-type JSONReport struct {
+type JsonReport struct {
 	Schema    string        `json:"schema"`
 	Source    string        `json:"deploy_source"`
 	Target    string        `json:"active_binary"`
 	DeployDir string        `json:"deploy_dir"`
-	Findings  []JSONFinding `json:"findings"`
+	Findings  []JsonFinding `json:"findings"`
 	HasErr    bool          `json:"has_errors"`
 	HasFix    bool          `json:"has_fixable"`
 }
 
-// JSONFinding mirrors Finding with snake_case JSON tags.
-type JSONFinding struct {
+// JsonFinding mirrors Finding with snake_case JSON tags.
+type JsonFinding struct {
 	ID        string `json:"id"`
 	Title     string `json:"title"`
 	Severity  string `json:"severity"`
@@ -30,9 +34,9 @@ type JSONFinding struct {
 	IsFixable bool   `json:"is_fixable"`
 }
 
-// PrintJSON writes the report as indented JSON to stdout.
-func (r *Report) PrintJSON() error {
-	payload := r.toJSON()
+// PrintJson writes the report as indented JSON to stdout.
+func (r *Report) PrintJson() error {
+	payload := r.toJson()
 	out, err := json.MarshalIndent(payload, "", "  ")
 	if err != nil {
 		return err
@@ -41,22 +45,22 @@ func (r *Report) PrintJSON() error {
 	return nil
 }
 
-func (r *Report) toJSON() JSONReport {
-	return JSONReport{
+func (r *Report) toJson() JsonReport {
+	return JsonReport{
 		Schema:    "movie-doctor/v1",
 		Source:    r.Source,
 		Target:    r.Target,
 		DeployDir: r.DeployDir,
 		HasErr:    r.HasErrors(),
 		HasFix:    r.HasFixable(),
-		Findings:  toJSONFindings(r.Findings),
+		Findings:  toJsonFindings(r.Findings),
 	}
 }
 
-func toJSONFindings(findings []Finding) []JSONFinding {
-	out := make([]JSONFinding, 0, len(findings))
+func toJsonFindings(findings []Finding) []JsonFinding {
+	out := make([]JsonFinding, 0, len(findings))
 	for _, f := range findings {
-		out = append(out, JSONFinding{
+		out = append(out, JsonFinding{
 			ID:        f.ID,
 			Title:     f.Title,
 			Severity:  string(f.Severity),

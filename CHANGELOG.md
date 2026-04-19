@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.128.3
+
+### Fixed
+- **Acronym MixedCaps regression in `doctor/json.go` + `cmd/doctor.go`** — renamed `JSONReport`→`JsonReport`, `JSONFinding`→`JsonFinding`, `PrintJSON`→`PrintJson`, `toJSON`→`toJson`, `toJSONFindings`→`toJsonFindings`, `emitJSON`→`emitJson`, `doctorJSON`→`doctorJson` to comply with the project-specific MixedCaps rule (`spec/01-coding-guidelines/03-coding-guidelines-spec/03-golang/09-acronym-naming.md`). The user-facing `--json` flag and JSON wire format are unchanged.
+
+### Documentation
+- **New `spec/12-ci-cd-pipeline/05-ci-cd-issues/` folder** — granular per-incident log of every CI lint failure encountered, one file per issue. Each file documents symptom, trigger, root cause, fix pattern, prevention rule, and version history. AI/contributors must read this folder before fixing similar errors.
+  - `00-overview.md` — folder convention + index table
+  - `01-misspell-british-american.md` — misspell linter (US locale), 22-entry British→American table
+  - `02-gofmt-struct-tag-padding.md` — gofmt rejects hand-padded struct tags
+  - `03-gofmt-doc-list-indent.md` — gofmt requires 2-space indent for numbered lists in doc comments
+  - `04-govet-fieldalignment.md` — struct field order rules to minimise padding
+  - `05-acronym-mixedcaps.md` — project-specific MixedCaps rule (inverts Effective Go), exemption process for stdlib interface overrides
+- **Memory updates**: `mem://index.md` Core gained two new rules (American English only, MixedCaps acronyms) plus a pointer to the new ci-cd-issues folder. `mem://constraints/acronym-mixedcaps` history extended with v2.128.3 regression entry.
+
 ## v2.128.2
 
 ### Fixed

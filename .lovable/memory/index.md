@@ -20,7 +20,9 @@ Zero nested if. Max 2 conditions per if. No else after return. Functions ≤15 l
 No magic strings — use constants/enums. No fmt.Errorf — use apperror.Wrap().
 Updater rule: in update mode, deploy target = active PATH binary, NEVER powershell.json deployPath.
 Updater rule: never write expected os.Remove failures on *-update-* artifacts to stderr (PowerShell turns it into NativeCommandError).
-American English ONLY in code/comments/CHANGELOG/spec — misspell uses US locale. behaviour→behavior, optimised→optimized, catalogued→cataloged, normalised→normalized, analyse→analyze, colour→color, centre→center, organise→organize, cancelled→canceled. See ci-cd playbook for full table.
+American English ONLY in code/comments/CHANGELOG/spec — misspell uses US locale. behaviour→behavior, optimised→optimized, catalogued→cataloged. Full table in ci-cd playbook.
+Acronym MixedCaps: Json/Imdb/Tmdb/Api/Http/Url/Sql/Html/Xml in Go identifiers — NEVER JSON/IMDb/TMDb/API/HTTP/URL/SQL/HTML/XML. Project rule overrides Effective Go. Bare 2-letter `ID` and trailing locals (`imdbID`, `tmdbID`, `imgURL`) exempted.
+CI lint failures: every recurring lint error is logged in spec/12-ci-cd-pipeline/05-ci-cd-issues/ — read before fixing similar errors.
 
 
 ## Memories
@@ -35,6 +37,8 @@ American English ONLY in code/comments/CHANGELOG/spec — misspell uses US local
 - [API base variable](mem://preferences/api-base-variable) — JS must use single API_BASE variable, never repeat URL
 - [Boolean naming](mem://constraints/boolean-no-negative-words) — IsUndone→IsReverted; never use un/not/no in boolean names
 - [Updater scope](mem://constraints/updater-scope) — Go updater never runs git/build; all git+build belongs in run.ps1
+- [Acronym MixedCaps](mem://constraints/acronym-mixedcaps) — Json/Imdb/Tmdb/Api/Http/Url, never JSON/IMDb/etc. Spec issue 05
+- [CI/CD build fixes playbook](mem://ci-cd/01-build-fixes-playbook) — All recurring gofmt/govet/misspell/acronym errors with prevention rules
 - [Timestamp bug](mem://issues/01-timestamp-bug) — Fixed: hardcoded "now" → RFC3339
 - [Duplicate TMDb fetch](mem://issues/02-duplicate-tmdb-fetch) — Fixed: shared helpers
 - [Large files](mem://issues/03-large-files) — Fixed: split to <200 lines

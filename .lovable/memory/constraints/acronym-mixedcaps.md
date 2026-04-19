@@ -51,6 +51,15 @@ When adding a new identifier:
 - If the acronym is the trailing token of an unexported local — leave it
   in the original all-caps form per Go idiom.
 
-History: applied wholesale in v2.115.0 via a single sed sweep across 17
-Go files. Earlier piecemeal renames: `IMDbCacheUnless`→`ImdbCacheUnless`
-(v2.107.0), `db.SetImdbLookup` from inception.
+## History
+
+- **v2.107.0** — first piecemeal rename: `IMDbCacheUnless`→`ImdbCacheUnless`.
+- **v2.115.0** — wholesale sed sweep across 17 Go files. Spec authored.
+- **v2.128.3** — first regression after spec: `doctor/json.go` (`JSONReport`/`JSONFinding`/`PrintJSON`/`toJSON`/`toJSONFindings`) + `cmd/doctor.go` (`doctorJSON`/`emitJSON`). Fixed.
+
+## See also
+
+- Spec: `spec/01-coding-guidelines/03-coding-guidelines-spec/03-golang/09-acronym-naming.md`
+- Issue file: `spec/12-ci-cd-pipeline/05-ci-cd-issues/05-acronym-mixedcaps.md`
+- Playbook: `mem://ci-cd/01-build-fixes-playbook`
+
