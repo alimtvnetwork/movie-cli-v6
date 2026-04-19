@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.128.6
+
+### Added
+- **MIT License** — project now licensed under MIT. Added `LICENSE` file with full MIT text (Copyright (c) 2024-2025 Alim TV Network).
+- **Go Report Card badge** — added to README alongside existing CI and version badges.
+
+### Changed
+- **README license badge** — updated from `license-Private-red` to `license-MIT-blue` linking to the LICENSE file.
+
 ## v2.128.5
 
 ### Fixed
