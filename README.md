@@ -26,17 +26,39 @@ _Scan folders, clean filenames, fetch TMDb metadata, organize files, and track y
 
 </div>
 
-### Install on Windows (PowerShell)
+### Install latest release
+
+Picks up whatever is currently tagged `latest` on GitHub. Use this for first-time installs and casual upgrades.
+
+**Windows (PowerShell)**
 
 ```powershell
 irm https://github.com/alimtvnetwork/movie-cli-v5/releases/latest/download/install.ps1 | iex
 ```
 
-### Install on Linux / macOS
+**Linux / macOS**
 
 ```bash
 curl -fsSL https://github.com/alimtvnetwork/movie-cli-v5/releases/latest/download/install.sh | bash
 ```
+
+### Install a specific version (pinned)
+
+Installs exactly the version in the URL — never auto-upgrades. Use this for CI pipelines, Dockerfiles, reproducible setups, or when you need to roll back. Replace `v2.130.0` with the [release tag](https://github.com/alimtvnetwork/movie-cli-v5/releases) you want.
+
+**Windows (PowerShell)**
+
+```powershell
+irm https://github.com/alimtvnetwork/movie-cli-v5/releases/download/v2.130.0/install.ps1 | iex
+```
+
+**Linux / macOS**
+
+```bash
+curl -fsSL https://github.com/alimtvnetwork/movie-cli-v5/releases/download/v2.130.0/install.sh | bash
+```
+
+> **Which one should I use?** Use **latest** for personal machines so you stay current. Use **pinned** anywhere reproducibility matters — the pinned script is hard-locked to the version in the URL and will install that exact tag forever, even after newer releases ship. ([contract spec](spec/12-ci-cd-pipeline/06-version-pinned-install-scripts.md))
 
 ### Set up & scan
 
@@ -188,29 +210,45 @@ $ movie suggest 5
 
 ### One-Liner Install (recommended)
 
-**Windows (PowerShell):**
+Two flavours — pick based on whether you want auto-updates or a frozen version.
+
+#### Latest release (auto-tracks newest)
+
+**Windows (PowerShell)**
 
 ```powershell
 irm https://github.com/alimtvnetwork/movie-cli-v5/releases/latest/download/install.ps1 | iex
 ```
 
-**Linux / macOS (Bash):**
+**Linux / macOS (Bash)**
 
 ```bash
 curl -fsSL https://github.com/alimtvnetwork/movie-cli-v5/releases/latest/download/install.sh | bash
 ```
 
-To pin a specific release, replace `latest/download` with `download/vX.Y.Z`:
+GitHub's `/releases/latest/` redirect resolves to whatever tag is currently marked latest, so re-running this one-liner installs the newest version each time.
+
+#### Pinned to a specific release
+
+**Windows (PowerShell)**
 
 ```powershell
-irm https://github.com/alimtvnetwork/movie-cli-v5/releases/download/v1.0.0/install.ps1 | iex
+irm https://github.com/alimtvnetwork/movie-cli-v5/releases/download/v2.130.0/install.ps1 | iex
 ```
+
+**Linux / macOS (Bash)**
 
 ```bash
-curl -fsSL https://github.com/alimtvnetwork/movie-cli-v5/releases/download/v1.0.0/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/movie-cli-v5/releases/download/v2.130.0/install.sh | bash
 ```
 
-> These one-liners use the installer assets attached to each GitHub Release. The repo-root `install.ps1` and `install.sh` are source bootstrap scripts for local builds.
+The script attached to each release has the version baked in (`PINNED_VERSION="v2.130.0"`) and will install **exactly** that tag — it never falls back to "latest" and never delegates to the bootstrap scripts. Replace `v2.130.0` with any [published release](https://github.com/alimtvnetwork/movie-cli-v5/releases).
+
+> **When to use which**
+> - **Latest** — personal machines, demos, "just give me the newest one"
+> - **Pinned** — CI pipelines, Dockerfiles, onboarding docs, reproducing a bug on a specific version, controlled rollbacks
+>
+> Both URLs point at installer assets attached to the GitHub Release. The repo-root `install.ps1` and `install.sh` are unrelated source bootstrap scripts for building locally.
 
 ### Installer Options
 

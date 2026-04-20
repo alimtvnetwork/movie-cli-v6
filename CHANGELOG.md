@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.130.1
+
+### Changed
+- **README Quick Start and Installation sections** — both now show **two** clearly separated install variants: a "latest release" one-liner using `/releases/latest/download/...` (auto-tracks newest) and a "pinned to vX.Y.Z" one-liner using `/releases/download/v2.130.0/...` (frozen, exact version forever). Each variant has its own header, Windows + Unix one-liners, and an explanatory note. Added a "When to use which" callout in both sections steering users to **latest** for personal machines and **pinned** for CI / Dockerfiles / onboarding docs / rollbacks. The pinned section explicitly notes that `PINNED_VERSION` is baked into the script and links to the contract at `spec/12-ci-cd-pipeline/06-version-pinned-install-scripts.md`.
+
 ## v2.130.0
 
 ### Added
