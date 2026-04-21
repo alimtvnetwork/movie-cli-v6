@@ -1,8 +1,8 @@
 # Project Overview
 
-**Name:** Mahin CLI (formerly Movie CLI)  
+**Name:** Movie CLI  
 **Type:** Go 1.22 CLI application (NOT a web app)  
-**Binary:** `mahin`  
+**Binary:** `movie`  
 **Module:** `github.com/alimtvnetwork/movie-cli-v5`  
 **Updated:** 2026-04-16
 
@@ -12,7 +12,7 @@ Cross-platform CLI tool for managing a personal movie and TV show library. Scans
 
 ## Key Architecture
 
-- Pure-Go SQLite (`modernc.org/sqlite`), WAL mode, single `mahin.db`
+- Pure-Go SQLite (`modernc.org/sqlite`), WAL mode, single `movie.db`
 - TMDb API for metadata
 - Cobra CLI framework
 - Console-safe self-update via gitmap handoff pattern
