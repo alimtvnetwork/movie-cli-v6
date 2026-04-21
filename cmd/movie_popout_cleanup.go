@@ -253,7 +253,4 @@ func uniqueTempPath(destPath string) string {
 	return destPath
 }
 
-// FileActionCompact is re-exported from the db package via a small alias so
-// the popout module can stay package-local and still reference the typed
-// constant directly. Keeps imports clean for callers writing tests.
-const FileActionCompact = db.FileActionCompact
+// (No re-export needed — db.FileActionCompact is referenced directly above.)
