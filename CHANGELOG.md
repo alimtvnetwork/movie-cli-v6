@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## v2.134.0
+
+### Added
+- **CI guard against old module paths (v2/v3/v4)** — new `Old module path regression guard` step in `.github/workflows/ci.yml` (runs in the `lint` job, right after the Mahin guard). Greps the entire repo for any `movie-cli-v2`, `movie-cli-v3`, or `movie-cli-v4` reference and hard-fails the build if found. Current module is `github.com/alimtvnetwork/movie-cli-v5`; any stale import or documentation reference to the old iterations is a regression.
+
 ## v2.133.0
 
 ### Added
