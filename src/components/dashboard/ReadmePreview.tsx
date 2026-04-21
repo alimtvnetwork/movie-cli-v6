@@ -304,6 +304,8 @@ export function ReadmePreview({ media }: ReadmePreviewProps) {
                 </div>
               </div>
 
+              <CommandReferencePanel />
+
               <pre className="max-h-96 overflow-auto rounded-md border bg-muted/40 p-4 text-xs font-mono text-foreground whitespace-pre-wrap break-words">
                 {content}
               </pre>
