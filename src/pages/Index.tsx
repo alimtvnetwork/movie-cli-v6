@@ -7,6 +7,7 @@ import { GenreFilter } from "@/components/dashboard/GenreFilter";
 import { TypeFilter } from "@/components/dashboard/TypeFilter";
 import { SortSelect } from "@/components/dashboard/SortSelect";
 import { StatsPanel } from "@/components/dashboard/StatsPanel";
+import { ReadmePreview } from "@/components/dashboard/ReadmePreview";
 import { useMediaFilters } from "@/components/dashboard/useMediaFilters";
 import { mockMedia } from "@/data/mock-media";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -57,6 +58,8 @@ const Index = () => {
           <StatsPanel media={mockMedia} />
         </CollapsibleContent>
       </Collapsible>
+
+      <ReadmePreview media={filtered} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
         <div className="flex-1 min-w-[200px]">

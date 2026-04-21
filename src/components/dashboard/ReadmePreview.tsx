@@ -1,0 +1,128 @@
+import { useMemo, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { FileText, ChevronDown, ChevronUp, Save, Copy, Check } from "lucide-react";
+import type { MediaItem } from "@/types/media";
+import { formatFileSize } from "@/lib/media-utils";
+import { toast } from "sonner";
+
+interface ReadmePreviewProps {
+  media: MediaItem[];
+}
+
+function buildReadmeContent(media: MediaItem[]): string {
+  const movies = media.filter((m) => m.type === "movie");
+  const tv = media.filter((m) => m.type === "tv");
+  const totalSize = media.reduce((sum, m) => sum + (m.fileSize ?? 0), 0);
+  const avgRating =
+    media.length > 0
+      ? (
+          media.reduce((sum, m) => sum + (m.tmdbRating ?? 0), 0) / media.length
+        ).toFixed(1)
+      : "0.0";
+
+  const genreSet = new Set<string>();
+  media.forEach((m) => m.genres?.forEach((g) => genreSet.add(g)));
+  const genres = Array.from(genreSet).sort();
+
+  const lines: string[] = [];
+  lines.push("# Media Library");
+  lines.push("");
+  lines.push(`Generated on ${new Date().toISOString().split("T")[0]}`);
+  lines.push("");
+  lines.push("## Summary");
+  lines.push("");
+  lines.push(`- **Total items:** ${media.length}`);
+  lines.push(`- **Movies:** ${movies.length}`);
+  lines.push(`- **TV Shows:** ${tv.length}`);
+  lines.push(`- **Total size:** ${formatFileSize(totalSize)}`);
+  lines.push(`- **Average rating:** ${avgRating} / 10`);
+  lines.push(`- **Unique genres:** ${genres.length}`);
+  lines.push("");
+  lines.push("## Genres");
+  lines.push("");
+  lines.push(genres.map((g) => `\`${g}\``).join(" · "));
+  lines.push("");
+  lines.push("## Titles");
+  lines.push("");
+  media
+    .slice()
+    .sort((a, b) => a.title.localeCompare(b.title))
+    .forEach((m) => {
+      const rating = m.tmdbRating ? ` — ⭐ ${m.tmdbRating.toFixed(1)}` : "";
+      lines.push(`- **${m.title}** (${m.year})${rating}`);
+    });
+  lines.push("");
+  return lines.join("\n");
+}
+
+export function ReadmePreview({ media }: ReadmePreviewProps) {
+  const [open, setOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const content = useMemo(() => buildReadmeContent(media), [media]);
+  const lineCount = content.split("\n").length;
+  const charCount = content.length;
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(content);
+    setCopied(true);
+    toast.success("Copied README.md content to clipboard");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleConfirmSave = () => {
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "README.md";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("README.md saved", {
+      description: `${lineCount} lines · ${charCount} characters`,
+    });
+  };
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger asChild>
+        <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
+          <FileText className="h-4 w-4" />
+          README.md preview
+          {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+        </Button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-2">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <div className="space-y-1">
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="h-4 w-4 text-primary" />
+                README.md
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Exact content that will be written · {lineCount} lines · {charCount} chars
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="gap-1.5" onClick={handleCopy}>
+                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? "Copied" : "Copy"}
+              </Button>
+              <Button size="sm" className="gap-1.5" onClick={handleConfirmSave}>
+                <Save className="h-3.5 w-3.5" />
+                Confirm & Save
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <pre className="max-h-96 overflow-auto rounded-md border bg-muted/40 p-4 text-xs font-mono text-foreground whitespace-pre-wrap break-words">
+              {content}
+            </pre>
+          </CardContent>
+        </Card>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
