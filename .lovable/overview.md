@@ -1,10 +1,11 @@
 # Project Overview
 
-**Name:** Movie CLI  
-**Type:** Go 1.22 CLI application (NOT a web app)  
-**Binary:** `movie`  
-**Module:** `github.com/alimtvnetwork/movie-cli-v5`  
-**Updated:** 2026-04-16
+**Name:** Movie CLI
+**Type:** Go 1.22 CLI application (NOT a web app)
+**Binary:** `movie` (`movie.exe` on Windows)
+**Repo folder:** `movie-cli`
+**Module:** `github.com/alimtvnetwork/movie-cli-v5`
+**Updated:** 2026-04-20
 
 ## Purpose
 
@@ -16,11 +17,12 @@ Cross-platform CLI tool for managing a personal movie and TV show library. Scans
 - TMDb API for metadata
 - Cobra CLI framework
 - Console-safe self-update via gitmap handoff pattern
-- Data folder at `<binary-dir>/data/` (resolved via `os.Executable()`)
+- Data folder at `<binary-dir>/data/` (resolved via `os.Executable()`) containing `movie.db`, `log/`, `config/`, `thumbnails/`, `json/`
+- Legacy `mahin.db` is auto-deleted on startup (no migration)
 
 ## Current Version
 
-v2.23.0 — includes console-safe updater, nested-if refactoring, guideline audit fixes.
+v2.132.0 — reverted "mahin" branding back to "movie" everywhere.
 
 ## Quick Links
 
