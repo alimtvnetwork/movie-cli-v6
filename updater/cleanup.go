@@ -31,7 +31,6 @@ type powershellConfig struct {
 //   - <name>-update-*[.exe]   handoff copies from any prior PID
 //   - *.old                   rename-first deploy backups
 //   - *.bak                   legacy backup files
-//   - legacy binaries (mahin*) and their handoff copies
 //
 // skipPath is an optional extra path that must be preserved, such as the
 // currently running handoff worker binary.
