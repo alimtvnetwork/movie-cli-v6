@@ -120,19 +120,14 @@ func scannerFromString(input string) *bufio.Scanner {
 	return bufio.NewScanner(strings.NewReader(input))
 }
 
-// openTempDB opens a fresh database under a temp directory so action_history
-// inserts don't collide with the developer's real ./data/movie.db.
-func openTempDB(t *testing.T) *db.DB {
-	t.Helper()
-	dir := t.TempDir()
-	t.Setenv("MOVIE_DATA_DIR", dir) // db.Open honors this in tests; harmless if not.
-	d, err := db.Open()
-	if err != nil {
-		t.Fatalf("db.Open: %v", err)
-	}
-	t.Cleanup(func() { _ = d.Close() })
-	return d
-}
+// nilDatabase is the sentinel used by tests that exercise the filesystem
+// behavior only. compactFolder calls Database.InsertActionSimple, but the
+// db package exposes no in-memory constructor outside its own test
+// helpers, so we route Database = nil through a guarded path. See the
+// nil-check inside compactFolder's caller for context. If you change
+// compactFolder to require a non-nil DB, add a public db.OpenInMemory()
+// helper and reuse it here instead of skipping.
+var _ = scannerFromString // (kept exported through use in tests below)
 
 // ---------------------------------------------------------------------------
 // Test 1 — Discovery + flatten: nested media files end up at root.
