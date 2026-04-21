@@ -2,7 +2,9 @@ import { useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { FileText, ChevronDown, ChevronUp, Save, Copy, Check } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { FileText, ChevronDown, ChevronUp, Save, Copy, Check, SlidersHorizontal } from "lucide-react";
 import type { MediaItem } from "@/types/media";
 import { formatFileSize } from "@/lib/media-utils";
 import { toast } from "sonner";
@@ -12,7 +14,34 @@ interface ReadmePreviewProps {
   media: MediaItem[];
 }
 
-function buildReadmeContent(media: MediaItem[]): string {
+export interface ReadmeSections {
+  overview: boolean;
+  topGenres: boolean;
+  topRated: boolean;
+  allGenres: boolean;
+  movies: boolean;
+  tv: boolean;
+}
+
+const DEFAULT_SECTIONS: ReadmeSections = {
+  overview: true,
+  topGenres: true,
+  topRated: true,
+  allGenres: true,
+  movies: true,
+  tv: true,
+};
+
+const SECTION_LABELS: { key: keyof ReadmeSections; label: string; icon: string }[] = [
+  { key: "overview", label: "Overview", icon: "📊" },
+  { key: "topGenres", label: "Top Genres", icon: "🔥" },
+  { key: "topRated", label: "Top Rated", icon: "🏆" },
+  { key: "allGenres", label: "All Genres", icon: "🏷️" },
+  { key: "movies", label: "Movies", icon: "🎞️" },
+  { key: "tv", label: "TV Shows", icon: "📺" },
+];
+
+function buildReadmeContent(media: MediaItem[], sections: ReadmeSections): string {
   const movies = media.filter((m) => m.type === "movie");
   const tv = media.filter((m) => m.type === "tv");
   const totalSize = media.reduce((sum, m) => sum + (m.fileSize ?? 0), 0);
@@ -53,22 +82,25 @@ function buildReadmeContent(media: MediaItem[]): string {
   lines.push("");
   lines.push("---");
   lines.push("");
-  lines.push("## 📊 Overview");
-  lines.push("");
-  lines.push("| Metric | Value |");
-  lines.push("| --- | --- |");
-  lines.push(`| Total items | **${media.length}** |`);
-  lines.push(`| 🎞️ Movies | ${movies.length} |`);
-  lines.push(`| 📺 TV Shows | ${tv.length} |`);
-  lines.push(`| 💾 Total size | ${formatFileSize(totalSize)} |`);
-  lines.push(`| ⭐ Average rating | ${avgRating} / 10 |`);
-  lines.push(`| 🏷️ Unique genres | ${genres.length} |`);
-  if (minYear > 0) {
-    lines.push(`| 📅 Year range | ${minYear} – ${maxYear} |`);
-  }
-  lines.push("");
 
-  if (topGenres.length > 0) {
+  if (sections.overview) {
+    lines.push("## 📊 Overview");
+    lines.push("");
+    lines.push("| Metric | Value |");
+    lines.push("| --- | --- |");
+    lines.push(`| Total items | **${media.length}** |`);
+    lines.push(`| 🎞️ Movies | ${movies.length} |`);
+    lines.push(`| 📺 TV Shows | ${tv.length} |`);
+    lines.push(`| 💾 Total size | ${formatFileSize(totalSize)} |`);
+    lines.push(`| ⭐ Average rating | ${avgRating} / 10 |`);
+    lines.push(`| 🏷️ Unique genres | ${genres.length} |`);
+    if (minYear > 0) {
+      lines.push(`| 📅 Year range | ${minYear} – ${maxYear} |`);
+    }
+    lines.push("");
+  }
+
+  if (sections.topGenres && topGenres.length > 0) {
     lines.push("## 🔥 Top Genres");
     lines.push("");
     topGenres.forEach(([g, count], i) => {
@@ -77,7 +109,7 @@ function buildReadmeContent(media: MediaItem[]): string {
     lines.push("");
   }
 
-  if (topRated.length > 0) {
+  if (sections.topRated && topRated.length > 0) {
     lines.push("## 🏆 Top Rated");
     lines.push("");
     lines.push("| # | Title | Year | Rating |");
@@ -90,14 +122,14 @@ function buildReadmeContent(media: MediaItem[]): string {
     lines.push("");
   }
 
-  if (genres.length > 0) {
+  if (sections.allGenres && genres.length > 0) {
     lines.push("## 🏷️ All Genres");
     lines.push("");
     lines.push(genres.map((g) => `\`${g}\``).join(" · "));
     lines.push("");
   }
 
-  if (movies.length > 0) {
+  if (sections.movies && movies.length > 0) {
     lines.push("## 🎞️ Movies");
     lines.push("");
     movies
@@ -111,7 +143,7 @@ function buildReadmeContent(media: MediaItem[]): string {
     lines.push("");
   }
 
-  if (tv.length > 0) {
+  if (sections.tv && tv.length > 0) {
     lines.push("## 📺 TV Shows");
     lines.push("");
     tv.slice()
@@ -135,9 +167,16 @@ export function ReadmePreview({ media }: ReadmePreviewProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const content = useMemo(() => buildReadmeContent(media), [media]);
+  const [sections, setSections] = useState<ReadmeSections>(DEFAULT_SECTIONS);
+
+  const content = useMemo(() => buildReadmeContent(media, sections), [media, sections]);
   const lineCount = content.split("\n").length;
   const charCount = content.length;
+  const enabledCount = Object.values(sections).filter(Boolean).length;
+
+  const toggleSection = (key: keyof ReadmeSections) => {
+    setSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(content);
@@ -192,7 +231,35 @@ export function ReadmePreview({ media }: ReadmePreviewProps) {
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              <div className="rounded-md border bg-muted/30 p-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm font-medium">Sections</span>
+                  <span className="text-xs text-muted-foreground">
+                    {enabledCount} of {SECTION_LABELS.length} enabled
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
+                  {SECTION_LABELS.map(({ key, label, icon }) => (
+                    <div key={key} className="flex items-center justify-between gap-2">
+                      <Label
+                        htmlFor={`section-${key}`}
+                        className="flex items-center gap-1.5 text-sm font-normal cursor-pointer"
+                      >
+                        <span>{icon}</span>
+                        <span>{label}</span>
+                      </Label>
+                      <Switch
+                        id={`section-${key}`}
+                        checked={sections[key]}
+                        onCheckedChange={() => toggleSection(key)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <pre className="max-h-96 overflow-auto rounded-md border bg-muted/40 p-4 text-xs font-mono text-foreground whitespace-pre-wrap break-words">
                 {content}
               </pre>
