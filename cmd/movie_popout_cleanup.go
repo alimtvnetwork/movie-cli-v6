@@ -37,20 +37,19 @@ import (
 // folderNames is the pre-discovered list of direct subfolder names that
 // existed at the start of the popout run. Anything new (e.g. .temp/ itself)
 // is skipped automatically.
-func compactNonMediaFolders(cc CleanupContext, rootDir string, folderNames []string, autoCompact bool) {
+func compactNonMediaFolders(cc CleanupContext, rootDir string, folderNames []string, autoCompact bool) int {
 	candidates := classifyCompactCandidates(rootDir, folderNames)
 	if len(candidates) == 0 {
-		return
+		return 0
 	}
 
 	printCompactSummary(candidates)
 
 	if autoCompact {
 		fmt.Println("\n  ⚙️  --auto-compact: moving all candidates into .temp/")
-		applyCompactAll(cc, rootDir, candidates)
-		return
+		return applyCompactAll(cc, rootDir, candidates)
 	}
-	promptCompactAction(cc, rootDir, candidates)
+	return promptCompactAction(cc, rootDir, candidates)
 }
 
 // classifyCompactCandidates returns subfolders that should be candidates
@@ -126,7 +125,7 @@ func printCompactSummary(folders []popoutFolderInfo) {
 	}
 }
 
-func promptCompactAction(cc CleanupContext, rootDir string, folders []popoutFolderInfo) {
+func promptCompactAction(cc CleanupContext, rootDir string, folders []popoutFolderInfo) int {
 	fmt.Println()
 	fmt.Println("  Options:")
 	fmt.Println("    [a] Compact ALL listed folders into .temp/")
@@ -137,29 +136,35 @@ func promptCompactAction(cc CleanupContext, rootDir string, folders []popoutFold
 
 	if !cc.Scanner.Scan() {
 		fmt.Println("  📁 No folders compacted.")
-		return
+		return 0
 	}
 	choice := strings.ToLower(strings.TrimSpace(cc.Scanner.Text()))
 
 	switch choice {
 	case "a":
-		applyCompactAll(cc, rootDir, folders)
+		return applyCompactAll(cc, rootDir, folders)
 	case "s":
-		selectiveCompact(cc, rootDir, folders)
+		return selectiveCompact(cc, rootDir, folders)
 	case "l":
-		listThenCompact(cc, rootDir, folders)
+		return listThenCompact(cc, rootDir, folders)
 	default:
 		fmt.Println("  📁 All folders kept.")
 	}
+	return 0
 }
 
-func applyCompactAll(cc CleanupContext, rootDir string, folders []popoutFolderInfo) {
+func applyCompactAll(cc CleanupContext, rootDir string, folders []popoutFolderInfo) int {
+	count := 0
 	for _, f := range folders {
-		compactFolder(cc, rootDir, f)
+		if compactFolder(cc, rootDir, f) != "" {
+			count++
+		}
 	}
+	return count
 }
 
-func selectiveCompact(cc CleanupContext, rootDir string, folders []popoutFolderInfo) {
+func selectiveCompact(cc CleanupContext, rootDir string, folders []popoutFolderInfo) int {
+	count := 0
 	for _, f := range folders {
 		status := "empty"
 		if len(f.files) > 0 {
@@ -168,32 +173,39 @@ func selectiveCompact(cc CleanupContext, rootDir string, folders []popoutFolderI
 		fmt.Printf("\n  %s/ — %s\n", f.name, status)
 		fmt.Print("    Compact to .temp/? [y/N]: ")
 		if !cc.Scanner.Scan() {
-			return
+			return count
 		}
 		ans := strings.ToLower(strings.TrimSpace(cc.Scanner.Text()))
 		if ans == "y" || ans == "yes" {
-			compactFolder(cc, rootDir, f)
+			if compactFolder(cc, rootDir, f) != "" {
+				count++
+			}
 			continue
 		}
 		fmt.Println("    Kept.")
 	}
+	return count
 }
 
-func listThenCompact(cc CleanupContext, rootDir string, folders []popoutFolderInfo) {
+func listThenCompact(cc CleanupContext, rootDir string, folders []popoutFolderInfo) int {
+	count := 0
 	for _, f := range folders {
 		fmt.Printf("\n  📁 %s/\n", f.name)
 		printFolderListing(f)
 		fmt.Print("    Compact to .temp/? [y/N]: ")
 		if !cc.Scanner.Scan() {
-			return
+			return count
 		}
 		ans := strings.ToLower(strings.TrimSpace(cc.Scanner.Text()))
 		if ans == "y" || ans == "yes" {
-			compactFolder(cc, rootDir, f)
+			if compactFolder(cc, rootDir, f) != "" {
+				count++
+			}
 			continue
 		}
 		fmt.Println("    Kept.")
 	}
+	return count
 }
 
 func printFolderListing(f popoutFolderInfo) {
