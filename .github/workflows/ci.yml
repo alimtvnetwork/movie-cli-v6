@@ -96,7 +96,7 @@ jobs:
           # mahin* handoff binaries from old installs. Any other occurrence
           # is a regression — fail the build.
           set -e
-          ALLOWED_FILES='^(\./)?(db/open\.go|updater/cleanup\.go|CHANGELOG\.md|\.lovable/)'
+          ALLOWED_FILES='^(\./)?(db/open\.go|updater/cleanup\.go|CHANGELOG\.md|\.lovable/|\.github/workflows/ci\.yml)'
           violations=$(grep -rn -i --include='*.go' --include='*.md' --include='*.mmd' \
               --include='*.json' --include='*.yml' --include='*.yaml' \
               --include='*.sh' --include='*.ps1' --include='Makefile' \
