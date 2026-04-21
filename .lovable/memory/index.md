@@ -5,6 +5,7 @@ Updated: now
 
 ## Core
 Go 1.22 CLI project (NOT web). Binary: `movie`. Ignore Lovable build errors.
+COMMAND SYNTAX: FLAT — `movie <cmd>` ONLY. NEVER `movie movie <cmd>`. No nested movie parent. Examples: `movie scan`, `movie config set ...`, `movie ls`. Wrong: `movie movie scan`.
 One file per command, max ~200 lines. Shared helpers in movie_info.go and movie_resolve.go.
 File naming: `01-name-of-file.md`. Keep folder file counts small.
 Plans & suggestions tracked in single files, not per-item files.
@@ -39,6 +40,7 @@ Release-page install scripts MUST be version-pinned: `install.{ps1,sh}` attached
 - [Version bump rule](mem://preferences/version-bump) — Always bump version after every code change
 - [API base variable](mem://preferences/api-base-variable) — JS must use single API_BASE variable, never repeat URL
 - [Boolean naming](mem://constraints/boolean-no-negative-words) — IsUndone→IsReverted; never use un/not/no in boolean names
+- [Flat command syntax](mem://constraints/command-syntax-flat) — Always `movie <cmd>`, NEVER `movie movie <cmd>`. Recurring AI mistake.
 - [Updater scope](mem://constraints/updater-scope) — Go updater never runs git/build; all git+build belongs in run.ps1
 - [Acronym MixedCaps](mem://constraints/acronym-mixedcaps) — Json/Imdb/Tmdb/Api/Http/Url, never JSON/IMDb/etc. Spec issue 05
 - [CI/CD build fixes playbook](mem://ci-cd/01-build-fixes-playbook) — All recurring gofmt/govet/misspell/acronym errors with prevention rules
