@@ -5,6 +5,7 @@ Updated: now
 
 ## Core
 Go 1.22 CLI project (NOT web). Binary: `movie`. Ignore Lovable build errors.
+COMMAND SYNTAX: FLAT — `movie <cmd>` ONLY. NEVER `movie movie <cmd>`. No nested movie parent. Examples: `movie scan`, `movie config set ...`, `movie ls`. Wrong: `movie movie scan`.
 One file per command, max ~200 lines. Shared helpers in movie_info.go and movie_resolve.go.
 File naming: `01-name-of-file.md`. Keep folder file counts small.
 Plans & suggestions tracked in single files, not per-item files.

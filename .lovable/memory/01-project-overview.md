@@ -27,7 +27,9 @@ A cross-platform CLI tool for managing a personal movie and TV show library. It 
 7. **apperror.Wrap()** for all error wrapping (never fmt.Errorf)
 8. **Zero nesting rule** — no nested ifs, max 2 conditions per if, no else after return
 
-## Command Tree (21 commands)
+## Command Tree (FLAT — no `movie movie` nesting)
+
+**CRITICAL**: All commands are direct subcommands of `movie`. There is NO `movie movie <cmd>`. Always write `movie <cmd>`.
 
 ```
 movie
@@ -35,23 +37,22 @@ movie
 ├── version                    # Version/commit/build date + Go/OS info
 ├── update                     # Console-safe self-update (gitmap handoff)
 ├── changelog                  # Show changelog
-└── movie
-    ├── config                 # View/set configuration
-    ├── scan                   # Scan folder → DB + TMDb + JSON metadata
-    ├── ls                     # Paginated library list (file-backed only)
-    ├── search                 # Live TMDb search → save
-    ├── info                   # Local DB → TMDb fallback
-    ├── suggest                # Recommendations/trending + genre discover
-    ├── move                   # Browse + move + track (--all batch, cross-drive)
-    ├── rename                 # Batch clean rename
-    ├── undo                   # Revert last move/rename (with confirmation)
-    ├── play                   # Open with default player
-    ├── stats                  # Library statistics + file sizes
-    ├── tag                    # Add/remove/list tags
-    ├── export                 # Export library data
-    ├── duplicates             # Detect duplicates by TMDb ID/filename/size
-    ├── cleanup                # Find/remove stale DB entries
-    └── watch                  # Watchlist: to-watch/watched tracking
+├── config                     # View/set configuration
+├── scan                       # Scan folder → DB + TMDb + JSON metadata
+├── ls                         # Paginated library list (file-backed only)
+├── search                     # Live TMDb search → save
+├── info                       # Local DB → TMDb fallback
+├── suggest                    # Recommendations/trending + genre discover
+├── move                       # Browse + move + track (--all batch, cross-drive)
+├── rename                     # Batch clean rename
+├── undo                       # Revert last move/rename (with confirmation)
+├── play                       # Open with default player
+├── stats                      # Library statistics + file sizes
+├── tag                        # Add/remove/list tags
+├── export                     # Export library data
+├── duplicates                 # Detect duplicates by TMDb ID/filename/size
+├── cleanup                    # Find/remove stale DB entries
+└── watch                      # Watchlist: to-watch/watched tracking
 ```
 
 ## Important Notes for AI
