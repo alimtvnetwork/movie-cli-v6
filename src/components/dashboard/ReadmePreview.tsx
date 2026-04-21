@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { FileText, ChevronDown, ChevronUp, Save, Copy, Check, SlidersHorizontal } from "lucide-react";
+import { FileText, ChevronDown, ChevronUp, Save, Copy, Check, SlidersHorizontal, ShieldCheck } from "lucide-react";
 import type { MediaItem } from "@/types/media";
 import { formatFileSize } from "@/lib/media-utils";
 import { toast } from "sonner";
@@ -163,13 +163,42 @@ function buildReadmeContent(media: MediaItem[], sections: ReadmeSections): strin
   return lines.join("\n");
 }
 
+/**
+ * Sanitizes README content by collapsing any accidental `movie movie ` (or
+ * repeated `movie movie movie ...`) command prefixes back into a single
+ * `movie `. The CLI command tree is FLAT — `movie <cmd>` only — so any
+ * nested form is always a bug. See mem://constraints/command-syntax-flat.
+ *
+ * Returns the cleaned text and a count of how many occurrences were fixed.
+ */
+export function sanitizeMovieCommandPrefix(input: string): {
+  text: string;
+  replacements: number;
+} {
+  let replacements = 0;
+  // Collapse one or more leading `movie ` repeats followed by another `movie `
+  // into a single `movie `. Word-boundaries prevent matching things like
+  // `moviemovie` or `movies`.
+  const text = input.replace(/\bmovie(?:\s+movie)+\b/gi, (match) => {
+    replacements += 1;
+    // Preserve the casing of the first occurrence.
+    const first = match.split(/\s+/)[0];
+    return first;
+  });
+  return { text, replacements };
+}
+
 export function ReadmePreview({ media }: ReadmePreviewProps) {
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [sections, setSections] = useState<ReadmeSections>(DEFAULT_SECTIONS);
 
-  const content = useMemo(() => buildReadmeContent(media, sections), [media, sections]);
+  const { content, sanitizedCount } = useMemo(() => {
+    const raw = buildReadmeContent(media, sections);
+    const { text, replacements } = sanitizeMovieCommandPrefix(raw);
+    return { content: text, sanitizedCount: replacements };
+  }, [media, sections]);
   const lineCount = content.split("\n").length;
   const charCount = content.length;
   const enabledCount = Object.values(sections).filter(Boolean).length;
@@ -186,15 +215,22 @@ export function ReadmePreview({ media }: ReadmePreviewProps) {
   };
 
   const handleSave = () => {
-    const blob = new Blob([content], { type: "text/markdown" });
+    // Defense-in-depth: re-sanitize at write time in case content is mutated
+    // by future code paths between preview and save.
+    const { text: safeContent, replacements } = sanitizeMovieCommandPrefix(content);
+    const blob = new Blob([safeContent], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "README.md";
     a.click();
     URL.revokeObjectURL(url);
+    const sanitizedNote =
+      replacements > 0
+        ? ` · auto-fixed ${replacements} \`movie movie\` occurrence${replacements === 1 ? "" : "s"}`
+        : "";
     toast.success("README.md saved", {
-      description: `${lineCount} lines · ${charCount} characters`,
+      description: `${lineCount} lines · ${charCount} characters${sanitizedNote}`,
     });
   };
 
@@ -219,6 +255,13 @@ export function ReadmePreview({ media }: ReadmePreviewProps) {
                 <p className="text-xs text-muted-foreground">
                   Exact content that will be written · {lineCount} lines · {charCount} chars
                 </p>
+                {sanitizedCount > 0 && (
+                  <p className="text-xs text-primary flex items-center gap-1">
+                    <ShieldCheck className="h-3 w-3" />
+                    Auto-fixed {sanitizedCount} <code className="px-1 rounded bg-muted">movie movie</code>{" "}
+                    occurrence{sanitizedCount === 1 ? "" : "s"} → <code className="px-1 rounded bg-muted">movie</code>
+                  </p>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" className="gap-1.5" onClick={handleCopy}>
