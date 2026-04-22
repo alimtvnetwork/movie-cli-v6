@@ -50,6 +50,10 @@ type ScopeFilter struct {
 	// from cwd, in which case interactive flows should confirm with the
 	// user before acting.
 	UserProvidedPath bool
+	// AssumeYes is true when the user passed --yes / -y / --assume-yes.
+	// It bypasses BOTH the cwd-scope confirmation prompt AND the per-row
+	// "Undo this? [y/N]" prompt — designed for scripted runs.
+	AssumeYes bool
 }
 
 // HasGlobs reports whether any include or exclude pattern is set.
@@ -348,6 +352,10 @@ func FilterActions(actions []db.ActionRecord, scope string) []db.ActionRecord {
 // The verb is "Undo" or "Redo" — used purely for the prompt copy.
 func ConfirmCwdScope(scanner *bufio.Scanner, f ScopeFilter, verb string) (ScopeFilter, bool) {
 	if f.UserProvidedPath || f.Dir == "" {
+		return f, true
+	}
+	if f.AssumeYes {
+		fmt.Printf("🎯 %s scope (auto-confirmed via --yes): %s\n", verb, f.Dir)
 		return f, true
 	}
 	fmt.Printf("\n🎯 %s scope detected from current directory:\n", verb)
