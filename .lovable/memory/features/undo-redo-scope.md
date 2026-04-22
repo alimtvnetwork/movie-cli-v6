@@ -171,3 +171,33 @@ set and apply the SAME filter pipeline:
    shapes × 2 reverted states across moves and actions and asserts
    `len(preview) == len(execution)`. `TestScanLimitsAreUnified` fails
    the build if the constants ever drop below 200.
+
+## Enriched cwd-scope prompt (v2.147.0)
+The cwd-scope confirmation now shows the resolved directory, every
+active include/exclude glob, and a live "would act on" count so the
+user can verify the filter before confirming:
+
+```
+🎯 Undo scope detected from current directory:
+   📂 directory:   /home/me/movies/2024/
+   ✅ include:     *.mkv
+   🚫 exclude:     Trash
+   🔢 would act on: 1 moves, 3 actions
+   Use this scope?  [Y]es / [g]lobal / [l]ist again / [n]o :
+```
+
+- `Enter`/`y` proceed
+- `g` switch to `--global` (preserves include/exclude)
+- `l` re-print the prompt (handy after long output scrolled it off)
+- `n`/`q` cancel
+- anything else → cancel with "unrecognized choice"
+
+Auto-confirmed `--yes` runs print the same details block (without the
+question line) so scripted logs still record the exact filter.
+
+Implementation: `ScopePreviewFn` callback type + new
+`ConfirmCwdScopeWithPreview` function in `cmd/path_scope.go`. Cobra
+handlers pass `undoableCountsFn(database)` / `redoableCountsFn(database)`
+which reuse `FilterMovesWith` + the unified scan limits, so the
+previewed count matches the execution-time count exactly (parity
+contract from v2.146.0).

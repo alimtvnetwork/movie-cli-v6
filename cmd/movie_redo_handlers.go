@@ -158,7 +158,7 @@ func redoMoveByID(database *db.DB, scanner *bufio.Scanner, id int64) {
 }
 
 func redoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
-	f, ok := ConfirmCwdScope(scanner, f, "Redo")
+	f, ok := ConfirmCwdScopeWithPreview(scanner, f, "Redo", redoableCountsFn(database))
 	if !ok {
 		return
 	}
@@ -207,7 +207,7 @@ func redoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
 }
 
 func redoLastOperation(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
-	f, ok := ConfirmCwdScope(scanner, f, "Redo")
+	f, ok := ConfirmCwdScopeWithPreview(scanner, f, "Redo", redoableCountsFn(database))
 	if !ok {
 		return
 	}
@@ -343,4 +343,14 @@ func findLastRevertedBatchInScope(database *db.DB, f ScopeFilter) string {
 		return a.BatchId
 	}
 	return ""
+}
+
+// redoableCountsFn mirrors undoableCountsFn for the redo flows.
+func redoableCountsFn(database *db.DB) ScopePreviewFn {
+	return func(f ScopeFilter) (int, int) {
+		rawMoves, _ := database.ListMoveHistory(undoMoveScanLimit)
+		rawActions, _ := database.ListActions(undoActionScanLimit)
+		return countRevertedMoves(FilterMovesWith(rawMoves, f)),
+			countReverted(FilterActionsWith(rawActions, f))
+	}
 }

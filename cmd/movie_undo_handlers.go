@@ -196,7 +196,7 @@ func undoMoveByID(database *db.DB, scanner *bufio.Scanner, id int64) {
 }
 
 func undoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
-	f, ok := ConfirmCwdScope(scanner, f, "Undo")
+	f, ok := ConfirmCwdScopeWithPreview(scanner, f, "Undo", undoableCountsFn(database))
 	if !ok {
 		return
 	}
@@ -240,7 +240,7 @@ func undoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
 }
 
 func undoLastOperation(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
-	f, ok := ConfirmCwdScope(scanner, f, "Undo")
+	f, ok := ConfirmCwdScopeWithPreview(scanner, f, "Undo", undoableCountsFn(database))
 	if !ok {
 		return
 	}
@@ -443,4 +443,17 @@ func printUndoBatchResult(shortBatch string, undoable, failed int) {
 		return
 	}
 	fmt.Printf("⚠️  Batch %s: %d reverted, %d failed.\n", shortBatch, undoable-failed, failed)
+}
+
+// undoableCountsFn returns a ScopePreviewFn that, given a filter,
+// reports how many non-reverted moves and actions are currently in
+// scope. Used by the cwd-scope confirmation prompt so the user sees a
+// live "would act on N moves, N actions" line before confirming.
+func undoableCountsFn(database *db.DB) ScopePreviewFn {
+	return func(f ScopeFilter) (int, int) {
+		rawMoves, _ := database.ListMoveHistory(undoMoveScanLimit)
+		rawActions, _ := database.ListActions(undoActionScanLimit)
+		return countUndoableMoves(FilterMovesWith(rawMoves, f)),
+			countNonReverted(FilterActionsWith(rawActions, f))
+	}
 }
