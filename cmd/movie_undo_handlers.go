@@ -196,7 +196,7 @@ func undoMoveByID(database *db.DB, scanner *bufio.Scanner, id int64) {
 }
 
 func undoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
-	f, ok := ConfirmCwdScope(scanner, f, "Undo")
+	f, ok := ConfirmCwdScopeWithPreview(scanner, f, "Undo", undoableCountsFn(database))
 	if !ok {
 		return
 	}
@@ -240,7 +240,7 @@ func undoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
 }
 
 func undoLastOperation(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
-	f, ok := ConfirmCwdScope(scanner, f, "Undo")
+	f, ok := ConfirmCwdScopeWithPreview(scanner, f, "Undo", undoableCountsFn(database))
 	if !ok {
 		return
 	}

@@ -158,7 +158,7 @@ func redoMoveByID(database *db.DB, scanner *bufio.Scanner, id int64) {
 }
 
 func redoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
-	f, ok := ConfirmCwdScope(scanner, f, "Redo")
+	f, ok := ConfirmCwdScopeWithPreview(scanner, f, "Redo", redoableCountsFn(database))
 	if !ok {
 		return
 	}
@@ -207,7 +207,7 @@ func redoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
 }
 
 func redoLastOperation(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
-	f, ok := ConfirmCwdScope(scanner, f, "Redo")
+	f, ok := ConfirmCwdScopeWithPreview(scanner, f, "Redo", redoableCountsFn(database))
 	if !ok {
 		return
 	}
