@@ -357,31 +357,6 @@ func pickLastUndoableAction(database *db.DB, f ScopeFilter) *db.ActionRecord {
 	return nil
 }
 
-func undoSingleMove(database *db.DB, scanner *bufio.Scanner, m *db.MoveRecord) {
-	fmt.Println("⏪ Last move operation:")
-	fmt.Printf("   %s → %s\n", m.ToPath, m.FromPath)
-	if !confirmUndo(scanner) {
-		return
-	}
-	if err := executeMoveUndo(database, m); err != nil {
-		errlog.Error("Undo failed: %v", err)
-		return
-	}
-	fmt.Println("✅ Undo successful!")
-}
-
-func undoSingleAction(database *db.DB, scanner *bufio.Scanner, a *db.ActionRecord) {
-	printActionUndo(a)
-	if !confirmUndo(scanner) {
-		return
-	}
-	if err := executeActionUndo(database, a); err != nil {
-		errlog.Error("Undo failed: %v", err)
-		return
-	}
-	fmt.Println("✅ Undo successful!")
-}
-
 func findLastUndoableBatch(database *db.DB, f ScopeFilter) string {
 	actions, err := database.ListActions(200)
 	if err != nil {
