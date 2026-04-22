@@ -14,6 +14,11 @@
 // failure; 128+ collides with signal exit codes).
 package cmd
 
+import (
+	"fmt"
+	"os"
+)
+
 const (
 	// ExitOK is the implicit zero-exit success path. Returned when the
 	// operation completed with at least one row applied OR when the user
@@ -57,4 +62,28 @@ func exitLabel(code int) string {
 		return "nothing matched"
 	}
 	return "unknown"
+}
+
+// osExit is the indirection point so tests can stub the real os.Exit.
+// Production code MUST call exitWithCode (not osExit directly) so the
+// final summary line is always printed.
+var osExit = os.Exit
+
+// exitFootPrintf renders the trailing "exit: N (label)" footer. Lifted
+// to a var so tests can capture it without touching stdout.
+var exitFootPrintf = func(format string, a ...interface{}) {
+	fmt.Println()
+	fmt.Printf(format+"\n", a...)
+}
+
+// exitWithCode is the single os.Exit chokepoint for undo/redo runners.
+// Code 0 returns silently (no extra output) so happy-path runs stay
+// clean. Non-zero codes always print a labelled footer and call
+// os.Exit so the shell sees the real exit status.
+func exitWithCode(code int) {
+	if code == ExitOK {
+		return
+	}
+	exitFootPrintf("exit: %d (%s)", code, exitLabel(code))
+	osExit(code)
 }
