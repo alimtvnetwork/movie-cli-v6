@@ -18,6 +18,28 @@ type: feature
   "undo/redo last operation" flow. `--id` and `--move-id` always operate
   on the explicit record.
 
+## Cwd scope confirmation prompt (v2.143.0)
+When the scope was inferred from cwd (no `[path]` arg, no `--global`)
+and a destructive flow runs (`undo`, `undo --batch`, `redo`,
+`redo --batch`), we now prompt:
+
+```
+🎯 Undo scope detected from current directory:
+   /home/me/movies/2024/
+   Use this scope?  [Y]es / [g]lobal / [n]o :
+```
+
+- `Enter` / `y` → proceed with cwd scope
+- `g`           → switch to `--global` for this run
+- anything else → cancel
+
+`--list`, `--id`, `--move-id` skip the prompt — they're either read-only
+or already explicit.
+
+Implementation: `ScopeFilter.UserProvidedPath` is set true when the user
+passed `[path]` or `--global`. `ConfirmCwdScope(scanner, f, verb)` in
+`cmd/path_scope.go` short-circuits when that flag is true.
+
 ## Match rule (dir scope)
 An action / move is **in scope** when ANY of its stored paths is rooted
 under the scope dir. We check `MoveRecord.FromPath`, `MoveRecord.ToPath`,
