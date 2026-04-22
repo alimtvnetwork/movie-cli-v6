@@ -29,6 +29,7 @@ var (
 	undoListFlag  bool
 	undoBatchFlag bool
 	undoGlobal    bool
+	undoAssumeYes bool
 	undoActionID  int64
 	undoMoveID    int64
 	undoIncludes  []string
@@ -51,6 +52,7 @@ Flags:
   --move-id <id>   Undo a specific move_history record by ID
   --batch          Undo the entire last batch (e.g. a full scan)
   --global         Ignore the cwd / [path] scope
+  --yes, -y        Skip every confirmation prompt (scripted runs)
   --include <glob> Keep only actions whose paths match this glob (repeatable)
   --exclude <glob> Drop actions whose paths match this glob (repeatable)`,
 	Run: runMovieUndo,
@@ -60,6 +62,8 @@ func init() {
 	movieUndoCmd.Flags().BoolVar(&undoListFlag, "list", false, "Show recent undoable actions")
 	movieUndoCmd.Flags().BoolVar(&undoBatchFlag, "batch", false, "Undo entire last batch")
 	movieUndoCmd.Flags().BoolVar(&undoGlobal, "global", false, "Ignore cwd / path scope")
+	movieUndoCmd.Flags().BoolVarP(&undoAssumeYes, "yes", "y", false, "Skip all confirmation prompts (also: --assume-yes)")
+	movieUndoCmd.Flags().BoolVar(&undoAssumeYes, "assume-yes", false, "Alias for --yes")
 	movieUndoCmd.Flags().Int64Var(&undoActionID, "id", 0, "Undo specific action_history record")
 	movieUndoCmd.Flags().Int64Var(&undoMoveID, "move-id", 0, "Undo specific move_history record")
 	movieUndoCmd.Flags().StringSliceVar(&undoIncludes, "include", nil, "Glob pattern to keep (repeatable)")
@@ -76,7 +80,7 @@ func runMovieUndo(cmd *cobra.Command, args []string) {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	home, _ := os.UserHomeDir()
-	filter := buildScopeFilter(args, home, undoGlobal, undoIncludes, undoExcludes)
+	filter := buildScopeFilter(args, home, undoGlobal, undoIncludes, undoExcludes, undoAssumeYes)
 
 	if undoListFlag {
 		showUndoableList(database, filter)

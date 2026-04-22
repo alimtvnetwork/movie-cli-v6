@@ -151,6 +151,10 @@ func printRedoBatchResult(shortBatch string, redoable, failed int) {
 }
 
 func confirmRedo(scanner *bufio.Scanner) bool {
+	if redoAssumeYes {
+		fmt.Println("\n  ✅ Redo auto-confirmed via --yes")
+		return true
+	}
 	fmt.Print("\n  Redo this? [y/N]: ")
 	if !scanner.Scan() {
 		return false
