@@ -198,7 +198,7 @@ func scopeFromArgs(args []string, home string, isGlobal bool) string {
 
 // buildScopeFilter is the canonical builder used by undo/redo cobra runs.
 // It composes the dir scope with the user-supplied include/exclude globs.
-func buildScopeFilter(args []string, home string, isGlobal bool, includes, excludes []string) ScopeFilter {
+func buildScopeFilter(args []string, home string, isGlobal bool, includes, excludes []string, assumeYes bool) ScopeFilter {
 	return ScopeFilter{
 		Dir:      scopeFromArgs(args, home, isGlobal),
 		Includes: trimEmpty(includes),
@@ -207,6 +207,7 @@ func buildScopeFilter(args []string, home string, isGlobal bool, includes, exclu
 		// or --global. Otherwise we silently fell back to cwd and need to
 		// confirm before doing anything destructive.
 		UserProvidedPath: isGlobal || len(args) > 0,
+		AssumeYes:        assumeYes,
 	}
 }
 

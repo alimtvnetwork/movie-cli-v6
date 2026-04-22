@@ -26,6 +26,7 @@ var (
 	redoListFlag  bool
 	redoBatchFlag bool
 	redoGlobal    bool
+	redoAssumeYes bool
 	redoActionID  int64
 	redoMoveID    int64
 	redoIncludes  []string
@@ -48,6 +49,7 @@ Flags:
   --move-id <id>   Redo a specific move_history record by ID
   --batch          Redo the entire last reverted batch
   --global         Ignore the cwd / [path] scope
+  --yes, -y        Skip every confirmation prompt (scripted runs)
   --include <glob> Keep only actions whose paths match this glob (repeatable)
   --exclude <glob> Drop actions whose paths match this glob (repeatable)`,
 	Run: runMovieRedo,
@@ -57,6 +59,8 @@ func init() {
 	movieRedoCmd.Flags().BoolVar(&redoListFlag, "list", false, "Show recent redoable actions")
 	movieRedoCmd.Flags().BoolVar(&redoBatchFlag, "batch", false, "Redo entire last reverted batch")
 	movieRedoCmd.Flags().BoolVar(&redoGlobal, "global", false, "Ignore cwd / path scope")
+	movieRedoCmd.Flags().BoolVarP(&redoAssumeYes, "yes", "y", false, "Skip all confirmation prompts (also: --assume-yes)")
+	movieRedoCmd.Flags().BoolVar(&redoAssumeYes, "assume-yes", false, "Alias for --yes")
 	movieRedoCmd.Flags().Int64Var(&redoActionID, "id", 0, "Redo specific action_history record")
 	movieRedoCmd.Flags().Int64Var(&redoMoveID, "move-id", 0, "Redo specific move_history record")
 	movieRedoCmd.Flags().StringSliceVar(&redoIncludes, "include", nil, "Glob pattern to keep (repeatable)")
@@ -73,7 +77,7 @@ func runMovieRedo(cmd *cobra.Command, args []string) {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	home, _ := os.UserHomeDir()
-	filter := buildScopeFilter(args, home, redoGlobal, redoIncludes, redoExcludes)
+	filter := buildScopeFilter(args, home, redoGlobal, redoIncludes, redoExcludes, redoAssumeYes)
 
 	if redoListFlag {
 		showRedoableList(database, filter)
