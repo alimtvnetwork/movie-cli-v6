@@ -349,30 +349,84 @@ func FilterActions(actions []db.ActionRecord, scope string) []db.ActionRecord {
 //	[Enter] / y → proceed with the cwd scope
 //	g          → switch to --global (returns a global filter, true)
 //	n / q      → cancel (returns _, false)
+//	l          → re-print the scope details (handy after scrolling)
 //
 // The verb is "Undo" or "Redo" — used purely for the prompt copy.
+//
+// previewCounts is an optional callback that, given the current filter,
+// returns (matchedMoves, matchedActions). When non-nil and at least one
+// of the counts is > 0, the prompt also shows a "would act on" line so
+// the user can sanity-check the filter before committing. Pass nil to
+// suppress (e.g. for tests or non-interactive contexts).
+type ScopePreviewFn func(ScopeFilter) (matchedMoves, matchedActions int)
+
 func ConfirmCwdScope(scanner *bufio.Scanner, f ScopeFilter, verb string) (ScopeFilter, bool) {
+	return ConfirmCwdScopeWithPreview(scanner, f, verb, nil)
+}
+
+// ConfirmCwdScopeWithPreview is the richer form used by the cobra
+// handlers — it can show a live "would act on N moves / N actions"
+// estimate before the user confirms. ConfirmCwdScope wraps it with a
+// nil callback for callers that don't have DB access.
+func ConfirmCwdScopeWithPreview(scanner *bufio.Scanner, f ScopeFilter, verb string, previewCounts ScopePreviewFn) (ScopeFilter, bool) {
 	if f.UserProvidedPath || f.Dir == "" {
 		return f, true
 	}
 	if f.AssumeYes {
 		fmt.Printf("🎯 %s scope (auto-confirmed via --yes): %s\n", verb, f.Dir)
+		printScopeFilterDetails(f, previewCounts)
 		return f, true
 	}
+	for {
+		printCwdScopePrompt(verb, f, previewCounts)
+		if !scanner.Scan() {
+			return f, false
+		}
+		switch strings.ToLower(strings.TrimSpace(scanner.Text())) {
+		case "", "y", "yes":
+			return f, true
+		case "g", "global":
+			fmt.Println("   ↳ switching to --global scope")
+			return ScopeFilter{
+				Includes:         f.Includes,
+				Excludes:         f.Excludes,
+				UserProvidedPath: true,
+				AssumeYes:        f.AssumeYes,
+			}, true
+		case "l", "list", "show":
+			// Re-print and loop — useful when the prompt scrolled off.
+			continue
+		case "n", "no", "q", "quit":
+			fmt.Println("   ↳ canceled")
+			return f, false
+		default:
+			fmt.Println("   ↳ unrecognized choice — canceled")
+			return f, false
+		}
+	}
+}
+
+// printCwdScopePrompt renders the multi-line scope confirmation block.
+func printCwdScopePrompt(verb string, f ScopeFilter, previewCounts ScopePreviewFn) {
 	fmt.Printf("\n🎯 %s scope detected from current directory:\n", verb)
-	fmt.Printf("   %s\n", f.Dir)
-	fmt.Print("   Use this scope?  [Y]es / [g]lobal / [n]o : ")
-	if !scanner.Scan() {
-		return f, false
+	printScopeFilterDetails(f, previewCounts)
+	fmt.Print("   Use this scope?  [Y]es / [g]lobal / [l]ist again / [n]o : ")
+}
+
+// printScopeFilterDetails prints the dir, every active include/exclude
+// glob, and (when a callback is provided) a "would act on" preview.
+func printScopeFilterDetails(f ScopeFilter, previewCounts ScopePreviewFn) {
+	fmt.Printf("   📂 directory:   %s\n", f.Dir)
+	if len(f.Includes) > 0 {
+		fmt.Printf("   ✅ include:     %s\n", strings.Join(f.Includes, ", "))
+	} else {
+		fmt.Println("   ✅ include:     (no glob — every path under directory)")
 	}
-	switch strings.ToLower(strings.TrimSpace(scanner.Text())) {
-	case "", "y", "yes":
-		return f, true
-	case "g", "global":
-		fmt.Println("   ↳ switching to --global scope")
-		return ScopeFilter{Includes: f.Includes, Excludes: f.Excludes, UserProvidedPath: true}, true
-	default:
-		fmt.Println("   ↳ canceled")
-		return f, false
+	if len(f.Excludes) > 0 {
+		fmt.Printf("   🚫 exclude:     %s\n", strings.Join(f.Excludes, ", "))
+	}
+	if previewCounts != nil {
+		moves, actions := previewCounts(f)
+		fmt.Printf("   🔢 would act on: %d moves, %d actions\n", moves, actions)
 	}
 }
