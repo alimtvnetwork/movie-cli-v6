@@ -132,3 +132,22 @@ keep using `printHistorySummary` so they still report executed/failed.
 Implementation: `cmd/history_summary.go` — `PreviewSummary` struct,
 `printPreviewSummary`. Wired into `showUndoableList` and
 `showRedoableList`.
+
+## `--yes` / `-y` / `--assume-yes` (v2.145.0)
+Skips every interactive prompt for scripted runs while preserving the
+inferred cwd scope. Bypasses both:
+  - the cwd-scope confirmation (`ConfirmCwdScope`)
+  - the per-row `Undo this? [y/N]` / `Redo this? [y/N]` prompts
+
+Examples:
+```
+movie undo --yes               # cwd scope, no prompts
+movie undo -y --batch          # full batch, no prompts
+movie redo --assume-yes /some/dir
+```
+
+Wiring: `ScopeFilter.AssumeYes` flag + package-level `undoAssumeYes` /
+`redoAssumeYes` bools (read by `confirmUndo` / `confirmRedo` which don't
+see the filter directly). `buildScopeFilter` signature now takes the
+bool. Both cobra commands register `--yes`/`-y` and `--assume-yes` as
+aliases of the same variable.
