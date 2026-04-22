@@ -116,6 +116,10 @@ func undoRestore(database *db.DB, a *db.ActionRecord) error {
 }
 
 func confirmUndo(scanner *bufio.Scanner) bool {
+	if undoAssumeYes {
+		fmt.Println("\n  ✅ Undo auto-confirmed via --yes")
+		return true
+	}
 	fmt.Print("\n  Undo this? [y/N]: ")
 	if !scanner.Scan() {
 		return false
