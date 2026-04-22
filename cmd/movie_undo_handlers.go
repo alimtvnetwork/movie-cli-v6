@@ -12,13 +12,10 @@ import (
 func showUndoableList(database *db.DB, f ScopeFilter) {
 	fmt.Println("⏪ Recent undoable operations")
 	printScopeBanner(f)
+	fmt.Println()
 
 	moveSkipped := countUndoableMoveSkipped(database, f)
 	actionSkipped := countUndoableActionSkipped(database, f)
-	matchedMoves := countMatchedUndoMoves(database, f)
-	matchedActions := countMatchedUndoActions(database, f)
-	printScopeMatchedCounts(matchedMoves, matchedActions, moveSkipped, actionSkipped)
-	fmt.Println()
 
 	undoableMoves := printUndoableMoves(database, f)
 	undoableActions := printUndoableActions(database, f)
@@ -32,18 +29,6 @@ func showUndoableList(database *db.DB, f ScopeFilter) {
 		Matched: undoableMoves + undoableActions,
 		Skipped: moveSkipped + actionSkipped,
 	})
-}
-
-// countMatchedUndoMoves returns the number of non-reverted moves that
-// pass the current filter.
-func countMatchedUndoMoves(database *db.DB, f ScopeFilter) int {
-	raw, _ := database.ListMoveHistory(50)
-	return countUndoableMoves(FilterMovesWith(raw, f))
-}
-
-func countMatchedUndoActions(database *db.DB, f ScopeFilter) int {
-	raw, _ := database.ListActions(100)
-	return countNonReverted(FilterActionsWith(raw, f))
 }
 
 // countUndoableMoveSkipped returns how many non-reverted moves were
@@ -201,6 +186,10 @@ func undoMoveByID(database *db.DB, scanner *bufio.Scanner, id int64) {
 }
 
 func undoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
+	f, ok := ConfirmCwdScope(scanner, f, "Undo")
+	if !ok {
+		return
+	}
 	batchID := findLastUndoableBatch(database, f)
 	if batchID == "" {
 		fmt.Println("📭 No batch operations to undo in this scope.")
@@ -241,6 +230,10 @@ func undoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
 }
 
 func undoLastOperation(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
+	f, ok := ConfirmCwdScope(scanner, f, "Undo")
+	if !ok {
+		return
+	}
 	lastMove := pickLastUndoableMove(database, f)
 	lastAction := pickLastUndoableAction(database, f)
 	skipped := countUndoableMoveSkipped(database, f) +

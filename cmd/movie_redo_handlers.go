@@ -12,13 +12,10 @@ import (
 func showRedoableList(database *db.DB, f ScopeFilter) {
 	fmt.Println("⏩ Recent redoable operations")
 	printScopeBanner(f)
+	fmt.Println()
 
 	moveSkipped := countRedoableMoveSkipped(database, f)
 	actionSkipped := countRedoableActionSkipped(database, f)
-	matchedMoves := countMatchedRedoMoves(database, f)
-	matchedActions := countMatchedRedoActions(database, f)
-	printScopeMatchedCounts(matchedMoves, matchedActions, moveSkipped, actionSkipped)
-	fmt.Println()
 
 	redoableMoves := printRedoableMoves(database, f)
 	redoableActions := printRedoableActions(database, f)
@@ -32,16 +29,6 @@ func showRedoableList(database *db.DB, f ScopeFilter) {
 		Matched: redoableMoves + redoableActions,
 		Skipped: moveSkipped + actionSkipped,
 	})
-}
-
-func countMatchedRedoMoves(database *db.DB, f ScopeFilter) int {
-	raw, _ := database.ListMoveHistory(50)
-	return countRevertedMoves(FilterMovesWith(raw, f))
-}
-
-func countMatchedRedoActions(database *db.DB, f ScopeFilter) int {
-	raw, _ := database.ListActions(200)
-	return countReverted(FilterActionsWith(raw, f))
 }
 
 func countRedoableMoveSkipped(database *db.DB, f ScopeFilter) int {
@@ -169,6 +156,10 @@ func redoMoveByID(database *db.DB, scanner *bufio.Scanner, id int64) {
 }
 
 func redoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
+	f, ok := ConfirmCwdScope(scanner, f, "Redo")
+	if !ok {
+		return
+	}
 	batchID := findLastRevertedBatchInScope(database, f)
 	if batchID == "" {
 		fmt.Println("📭 No reverted batch operations to redo in this scope.")
@@ -214,6 +205,10 @@ func redoLastBatch(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
 }
 
 func redoLastOperation(database *db.DB, scanner *bufio.Scanner, f ScopeFilter) {
+	f, ok := ConfirmCwdScope(scanner, f, "Redo")
+	if !ok {
+		return
+	}
 	lastMove := pickLastRedoableMove(database, f)
 	lastAction := pickLastRedoableAction(database, f)
 	skipped := countRedoableMoveSkipped(database, f) +
