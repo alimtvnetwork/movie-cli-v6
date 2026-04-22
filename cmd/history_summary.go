@@ -69,7 +69,7 @@ type PreviewSummary struct {
 	AlreadyDoneHint string // optional copy: "already reverted" / "not reverted yet"
 }
 
-// printPreviewSummary writes a labelled preview block. Designed to make
+// printPreviewSummary writes a labeled preview block. Designed to make
 // it impossible for the user to confuse "what the filter matched" with
 // "what would actually be undone/redone if you ran the command".
 //
