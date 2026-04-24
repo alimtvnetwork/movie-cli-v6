@@ -54,6 +54,13 @@
   /* Results info */
   .results-info { font-size: 0.8rem; color: var(--muted); margin-bottom: 1rem; }
 
+  /* Export bar */
+  .export-bar { display: flex; gap: 0.5rem; margin-left: auto; align-items: center; }
+  .export-btn { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-secondary); padding: 0.3rem 0.7rem; border-radius: var(--radius-xs); font-size: 0.72rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; transition: all 0.15s; text-decoration: none; }
+  .export-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .export-btn[disabled] { opacity: 0.4; cursor: not-allowed; }
+  .export-btn[disabled]:hover { border-color: var(--border); color: var(--text-secondary); }
+
   /* Grid */
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1rem; }
 
@@ -204,6 +211,10 @@
           <option value="year-desc">Year ↓</option>
           <option value="year-asc">Year ↑</option>
         </select>
+      </div>
+      <div class="export-bar">
+        <button class="export-btn" id="exportCsvBtn" onclick="exportCurrentView('csv')" disabled title="Start movie rest to enable">⬇ CSV</button>
+        <button class="export-btn" id="exportJsonBtn" onclick="exportCurrentView('json')" disabled title="Start movie rest to enable">⬇ JSON</button>
       </div>
     </div>
 
