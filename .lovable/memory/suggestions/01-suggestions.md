@@ -52,8 +52,11 @@
 | # | Suggestion | Priority | Description |
 |---|-----------|----------|-------------|
 | S33 | REST API server mode | Medium | HTML dashboard over existing DB (P3) |
-| S34 | Watchlist TMDb sync | Low | Pull/push watchlist with TMDb account (P3) |
 | S35 | Acceptance criteria docs | Low | GIVEN/WHEN/THEN per command (P2) |
+
+## 🚫 Forbidden — Do NOT Suggest
+
+- ❌ **Watchlist TMDb account sync (pull/push)** — user banned. See `mem://constraints/no-tmdb-account-sync`. Local JSON `movie watch export/import` is the final design.
 
 ---
 
