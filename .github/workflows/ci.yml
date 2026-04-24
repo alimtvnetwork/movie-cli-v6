@@ -110,8 +110,16 @@ jobs:
               --exclude-dir=.git --exclude-dir=.release --exclude-dir=node_modules \
               -e 'm''ahin' . 2>/dev/null || true)
           if [ -n "$violations" ]; then
-            echo "::error::Forbidden legacy-name references found"
+            echo "Forbidden legacy-name references found:"
             echo "$violations"
+            echo ""
+            while IFS= read -r line; do
+              [ -z "$line" ] && continue
+              file=$(printf '%s' "$line" | cut -d: -f1)
+              lineno=$(printf '%s' "$line" | cut -d: -f2)
+              content=$(printf '%s' "$line" | cut -d: -f3-)
+              echo "::error file=${file},line=${lineno}::Forbidden legacy name: ${content}"
+            done <<< "$violations"
             echo ""
             echo "The legacy project name is permanently banned. Use 'movie' instead."
             exit 1
