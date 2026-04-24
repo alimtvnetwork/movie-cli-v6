@@ -15,8 +15,8 @@ import (
 
 type dashboardFilters struct {
 	Tags       []db.TagCount  `json:"tags"`
-	Genres     []string       `json:"genres"`
 	Types      map[string]int `json:"types"`
+	Genres     []string       `json:"genres"`
 	RatingMax  float64        `json:"rating_max"`
 	YearMin    int            `json:"year_min"`
 	YearMax    int            `json:"year_max"`
