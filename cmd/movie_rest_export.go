@@ -209,11 +209,11 @@ func similarCSVRow(s *tmdb.SearchResult) []string {
 	}
 	year := firstFour(s.ReleaseDate)
 	if year == "" {
-		year = firstFour(s.FirstAirDate)
+		year = firstFour(s.FirstAir)
 	}
 	return []string{
 		strconv.Itoa(s.ID), title, year,
-		strconv.FormatFloat(s.VoteAverage, 'f', 1, 64),
+		strconv.FormatFloat(s.VoteAvg, 'f', 1, 64),
 		s.Overview, s.PosterPath,
 	}
 }
