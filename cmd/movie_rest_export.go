@@ -1,7 +1,7 @@
 // movie_rest_export.go — exports the current dashboard list filter results
 // as CSV or JSON.
 //
-//   GET /api/dashboard/export?format=csv|json&<dashboard list filters>
+//	GET /api/dashboard/export?format=csv|json&<dashboard list filters>
 //
 // Reuses the same query parsing and filtering pipeline as
 // /api/dashboard/list so the exported rows always match what the user sees.
