@@ -43,6 +43,7 @@ Release-page install scripts MUST be version-pinned: `install.{ps1,sh}` attached
 - [Boolean naming](mem://constraints/boolean-no-negative-words) — IsUndone→IsReverted; never use un/not/no in boolean names
 - [Flat command syntax](mem://constraints/command-syntax-flat) — Always `movie <cmd>`, NEVER `movie movie <cmd>`. Recurring AI mistake.
 - [CWD-default rule](mem://constraints/cwd-default-rule) — All optional-path commands use ResolveTargetDir, default to cwd, never silent-empty
+- [No TMDb account sync](mem://constraints/no-tmdb-account-sync) — NEVER suggest watchlist pull/push with TMDb accounts. Local JSON only.
 - [Popout spec](mem://features/popout-spec) — Flatten media to root, compact non-media folders to <root>/.temp/, full undo
 - [Popout silent failure](mem://issues/08-popout-silent-failure) — v2.135→v2.136 fix: silent exit on no-arg popout/move
 - [Updater scope](mem://constraints/updater-scope) — Go updater never runs git/build; all git+build belongs in run.ps1
