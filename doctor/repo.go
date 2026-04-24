@@ -20,14 +20,14 @@ const RepoRecoveryCmd = "git fetch origin && git reset --hard origin/main && git
 // RepoStatus captures the local repo state vs origin/main.
 // Field order optimized for govet fieldalignment (strings, ints, bools last).
 type RepoStatus struct {
-	Branch     string
-	Summary    string
-	Recovery   string
-	Ahead      int
-	Behind     int
-	IsGitRepo  bool
-	IsClean    bool
-	IsCurrent  bool
+	Branch    string
+	Summary   string
+	Recovery  string
+	Ahead     int
+	Behind    int
+	IsGitRepo bool
+	IsClean   bool
+	IsCurrent bool
 }
 
 // CheckRepo runs the read-only git probes and returns a RepoStatus.
