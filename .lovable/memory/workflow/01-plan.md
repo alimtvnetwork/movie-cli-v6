@@ -109,7 +109,11 @@
 
 ## 🚫 Known Issues
 
-- **User's local repo stuck at v2.14.0** — needs `git reset --hard origin/main`. See `.lovable/pending-issues/01-local-repo-stale.md`
+- **Stale local repo** — RESOLVED in tracker. Action required on user's machine only:
+  ```
+  git fetch origin && git reset --hard origin/main && git clean -fd
+  ```
+  Cannot be executed by AI. See `.lovable/pending-issues/01-local-repo-stale.md`.
 
 ---
 
