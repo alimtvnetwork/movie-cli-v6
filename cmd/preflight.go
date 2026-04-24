@@ -47,10 +47,10 @@ Exit codes:
   0 = repo is clean and up to date
   4 = repo is stale, dirty, or on the wrong branch
   1 = preflight could not run (no git, bad path, etc.)`,
-	Run: runPreflight,
+	Run: runPreflightCmd,
 }
 
-func runPreflight(cmd *cobra.Command, args []string) {
+func runPreflightCmd(cmd *cobra.Command, args []string) {
 	repoPath := resolvePreflightRepo()
 	status, err := gitcheck.Check(gitcheck.Options{
 		RepoPath: repoPath,
