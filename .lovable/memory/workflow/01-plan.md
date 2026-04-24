@@ -103,7 +103,7 @@
 - [x] Director normalization table (`db/director.go`) ✅
 - [x] Season/Episode tables for TV series (`db/season.go`) ✅
 - [ ] REST API server mode with HTML dashboard
-- [ ] Watchlist sync with TMDb account
+- 🚫 **Watchlist TMDb account sync — FORBIDDEN.** See `mem://constraints/no-tmdb-account-sync`. Local JSON sync only.
 
 ---
 
@@ -118,6 +118,5 @@
 All P0/P1 work and guideline phases 1-7 are complete. Pick from remaining P2/P3:
 
 1. **REST API server mode** — HTML dashboard over the existing DB
-2. **Watchlist TMDb sync** — pull/push watchlist with TMDb account
-3. **Acceptance criteria docs** — GIVEN/WHEN/THEN per command (P2)
-4. **Resolve stale local repo** — user must run `git fetch origin && git reset --hard origin/main && git clean -fd`
+2. **Acceptance criteria docs** — GIVEN/WHEN/THEN per command (P2)
+3. **Resolve stale local repo** — user must run `git fetch origin && git reset --hard origin/main && git clean -fd`
